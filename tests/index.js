@@ -30,7 +30,7 @@ function initialize(networks) {
 
 async function evmMineAll(networks) {
     for (let i = 0; i < networks.length; i++) {
-        await utils.evmMine(5, new Web3.providers.HttpProvider('http://127.0.0.1:' + nodes.getNodePort(networks[i].id)));
+        await utils.evmMine(50, new Web3.providers.HttpProvider('http://127.0.0.1:' + nodes.getNodePort(networks[i].id)));
     }
 }
 
@@ -51,6 +51,7 @@ module.exports = {
         // Transfer token to user 2 on chain 2
         console.log('Transfer token');
         cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -s 1';
+        execSync(cmd);
         await utils.sleep(1);
         cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -t CHAIN2,' + users[2] + ',11';
         execSync(cmd);
@@ -61,7 +62,7 @@ module.exports = {
         // Check balance of user 2 on all chains
         console.log('Check');
         for (let i = 0; i < networks.length; i++) {
-            cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -ob CHAIN' + networks[0].id + ',' + users[2];
+            cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -ob CHAIN' + networks[i].id + ',' + users[2];
             let ret = execSync(cmd);
             assert(ret.includes('11'), 'Error');
         }

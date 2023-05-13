@@ -56,7 +56,6 @@ async function main() {
     await tests.runFTTests(networks, userPks);
 
     console.log('Success');
-    process.exit();
 }
 
 main();

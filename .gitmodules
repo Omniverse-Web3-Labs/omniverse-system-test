@@ -1,0 +1,6 @@
+[submodule "omniverse-synchronizer"]
+	path = omniverse-synchronizer
+	url = git@virgil.github.com:Omniverse-Web3-Labs/omniverse-synchronizer.git
+[submodule "contracts/omniverse-evm"]
+	path = contracts/omniverse-evm
+	url = git@virgil.github.com:Omniverse-Web3-Labs/omniverse-evm.git

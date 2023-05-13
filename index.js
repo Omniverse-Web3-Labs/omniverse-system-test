@@ -53,7 +53,12 @@ async function main() {
     // Update test config
     coordinator.onTest(networks, users);
     // Run test cases
-    await tests.runFTTests(networks, userPks);
+    if (process.argv[2] == 'ft') {
+        await tests.runFTTests(networks, userPks);
+    }
+    else {
+        await tests.runNFTTests(networks, userPks);
+    }
 
     console.log('Success');
 }

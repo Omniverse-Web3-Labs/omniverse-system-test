@@ -12,7 +12,7 @@ function updateOmniverseConfig(networks) {
             let port = nodes.getNodePort(networks[i].id);
             item.nodeAddress = 'http://127.0.0.1:' + port;
             item.chainId = 1337;
-            item.coolingDown = 10;
+            item.coolingDown = networks[i].coolingDown;
             item.omniverseChainId = networks[i].id;
         }
         cfg['CHAIN' + networks[i].id] = item;
@@ -87,10 +87,10 @@ function updateSynchronizerConfig(networks, contractType) {
     console.log('updateSynchronizerConfig');
     let omniverseCfg = JSON.parse(fs.readFileSync(config.get('omniverseContractPath') + 'config/default.json').toString());
     let cfg = {
-        scanInterval: 2,
+        scanInterval: 1,
         logLevel: 'debug',
         secret: 'config/.secret',
-        stateDB: ".secret",
+        stateDB: ".state",
         payload: {
             keys: ["op", "exData", "amount"],
             types: ["uint8", "bytes", "uint256"]

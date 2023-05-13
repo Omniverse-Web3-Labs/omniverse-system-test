@@ -4,7 +4,7 @@ const utils = require('../utils');
 const Web3 = require('web3');
 const fs = require('fs');
 const nodes = require('../nodes/index');
-// const { assert } = require("console");
+const assert = require('assert');
 
 function initialize(networks) {
     console.log('initialize');
@@ -24,9 +24,13 @@ function initialize(networks) {
     console.log('allienceInfo', allienceInfo);
     for (let i = 0; i < networks.length; i++) {
         cmd = 'cd ' + config.get('omniverseContractPath') + ' && node register/index.js -i CHAIN' + networks[i].id + ',' + allienceInfo;
-        console.log('cmd', cmd);
-        let ret = execSync(cmd);
-        console.log('ret', ret.toString())
+        execSync(cmd);
+    }
+}
+
+async function evmMineAll(networks) {
+    for (let i = 0; i < networks.length; i++) {
+        await utils.evmMine(5, new Web3.providers.HttpProvider('http://127.0.0.1:' + nodes.getNodePort(networks[i].id)));
     }
 }
 
@@ -41,21 +45,24 @@ module.exports = {
         let cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -m CHAIN1,' + users[1] + ',' + 100;
         execSync(cmd);
         await utils.sleep(2);
-        await utils.evmMine(5, new Web3.providers.HttpProvider('http://127.0.0.1:' + nodes.getNodePort(networks[0].id)));
+        await evmMineAll(networks);
+        await utils.sleep(2);
         
         // Transfer token to user 2 on chain 2
         console.log('Transfer token');
-        cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -s 1 && node register/index.js -t CHAIN2,' + users[2] + ',11';
+        cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -s 1';
+        await utils.sleep(1);
+        cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -t CHAIN2,' + users[2] + ',11';
         execSync(cmd);
         await utils.sleep(2);
-        await utils.evmMine(5, new Web3.providers.HttpProvider('http://127.0.0.1:' + nodes.getNodePort(networks[1].id)));
+        await evmMineAll(networks);
+        await utils.sleep(2);
 
         // Check balance of user 2 on all chains
         console.log('Check');
         for (let i = 0; i < networks.length; i++) {
             cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -ob CHAIN' + networks[0].id + ',' + users[2];
             let ret = execSync(cmd);
-            console.log('ret', ret.toString());
             assert(ret.includes('11'), 'Error');
         }
     }

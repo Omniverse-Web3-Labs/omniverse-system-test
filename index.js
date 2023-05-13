@@ -54,6 +54,9 @@ async function main() {
     coordinator.onTest(networks, users);
     // Run test cases
     await tests.runFTTests(networks, userPks);
+
+    console.log('Success');
+    process.exit();
 }
 
 main();

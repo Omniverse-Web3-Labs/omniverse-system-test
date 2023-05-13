@@ -1,0 +1,17 @@
+{
+    "omniverseContractPath": "../omniverse-evm/contracts/",
+    "omniverseToolPath": "../omniverse-evm/contracts/",
+    "synchronizerPath": "../omniverse-synchronizer/",
+    "coolingDown": 1,
+    "networks": [
+        {
+            "chainType": "EVM",
+            "secretKey": "0x0cc0c2de7e8c30525b4ca3b9e0b9703fb29569060d403261055481df7014f7fa"
+        },
+        {
+            "chainType": "EVM",
+            "secretKey": "0x0cc0c2de7e8c30525b4ca3b9e0b9703fb29569060d403261055481df7014f7fa",
+            "count": 1
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 {
-    "omniverseContractPath": "../omniverse-evm/contracts/",
-    "omniverseToolPath": "../omniverse-evm/contracts/",
-    "synchronizerPath": "../omniverse-synchronizer/",
+    "omniverseContractPath": "./contracts/omniverse-evm/contracts/",
+    "omniverseToolPath": "./contracts/omniverse-evm/contracts/",
+    "synchronizerPath": "./omniverse-synchronizer/",
     "coolingDown": 1,
     "networks": [
         {

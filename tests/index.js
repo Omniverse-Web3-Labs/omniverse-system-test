@@ -60,7 +60,7 @@ module.exports = {
         console.log('Mint token');
         let cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -m CHAIN1,' + users[1] + ',' + 100;
         execSync(cmd);
-        await utils.sleep(3);
+        await utils.sleep(5);
         
         // Transfer token to user 2 on chain 2
         console.log('Transfer token');
@@ -69,7 +69,7 @@ module.exports = {
         await utils.sleep(1);
         cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/index.js -t CHAIN2,' + users[2] + ',11';
         execSync(cmd);
-        await utils.sleep(3);
+        await utils.sleep(5);
 
         // Check balance of user 2 on all chains
         console.log('Check');
@@ -89,7 +89,7 @@ module.exports = {
         console.log('Mint token');
         let cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -m CHAIN1,' + users[1] + ',' + 1;
         execSync(cmd);
-        await utils.sleep(3);
+        await utils.sleep(5);
         
         // Transfer token 1 to user 2 on chain 2
         console.log('Transfer token');
@@ -98,7 +98,7 @@ module.exports = {
         await utils.sleep(1);
         cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -t CHAIN2,' + users[2] + ',1';
         execSync(cmd);
-        await utils.sleep(3);
+        await utils.sleep(5);
 
         // Check balance of user 2 on all chains
         console.log('Check');

@@ -1,5 +1,8 @@
 const { execSync } = require("child_process");
 const config = require('config');
+const accounts = require('../utils/accounts');
+const utils = require("../utils/utils");
+fs = require('fs');
 
 class EVMChainDeployer {
     constructor() {
@@ -25,7 +28,7 @@ class EVMChainDeployer {
             }
             cfg[i] = item;
         }
-        fs.writeFileSync(config.get('omniverseContractPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }
     
     updateMigrationScript() {
@@ -39,7 +42,7 @@ class EVMChainDeployer {
         console.log('migrate networks', str);
         let migrationScript = fs.readFileSync('./res/2_deploy_contracts.js').toString();
         migrationScript = migrationScript.replace('CHAINS_ID_TEMPLATE', str);
-        fs.writeFileSync(config.get('omniverseContractPath') + 'migrations/2_deploy_contracts.js', migrationScript);
+        fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'migrations/2_deploy_contracts.js', migrationScript);
     }
     
     updateTruffleConfig() {
@@ -56,14 +59,14 @@ class EVMChainDeployer {
         console.log('truffle networks', str);
         let truffleConfigStr = fs.readFileSync('./res/config/truffle-config.js').toString();
         truffleConfigStr = truffleConfigStr.replace('NETWORK_TEMPLATE', str);
-        fs.writeFileSync(config.get('omniverseContractPath') + 'truffle-config.js', truffleConfigStr);
+        fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'truffle-config.js', truffleConfigStr);
     }
 
     async deployOmniverse(chainInfo) {
         console.log('deployOmniverse', chainInfo);
-        execSync("cd " + config.get('omniverseContractPath') + " && echo -n " + chainInfo.sk + " > .secret");
+        execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[1] + " > .secret");
 
-        let cmd = "cd " + config.get('omniverseContractPath') + " && npm install && npx truffle migrate --network CHAIN" + chainInfo.id;
+        let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName;
         execSync(cmd);
     }
 }

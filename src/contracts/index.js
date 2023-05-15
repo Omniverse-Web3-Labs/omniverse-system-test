@@ -1,4 +1,5 @@
 const config = require('config');
+const { execSync } = require("child_process");
 const EVMChain = require('./EVMChain');
 
 class ContractsMgr {
@@ -11,25 +12,24 @@ class ContractsMgr {
     }
 
     async afterDeploy(contractType) {
-        let omniverseCfg = JSON.parse(fs.readFileSync(config.get('omniverseContractPath') + 'config/default.json').toString());
+        let omniverseCfg = JSON.parse(fs.readFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json').toString());
         for (let i in global.networks) {
             if (global.networks[i].chainType == 'EVM') {
-                await EVMChain.deployOmniverse(global.networks[i]);
                 if (contractType == 'ft') {
-                    global.networks[i].EVMContract = omniverseCfg.skywalkerFungibleAddress;
+                    global.networks[i].EVMContract = omniverseCfg[i].skywalkerFungibleAddress;
                 }
                 else {
-                    global.networks[i].EVMContract = omniverseCfg.skywalkerNonFungibleAddress;
+                    global.networks[i].EVMContract = omniverseCfg[i].skywalkerNonFungibleAddress;
                 }
             }
         }
 
         if (contractType == 'ft') {
-            let cmd = 'cd ' + config.get('omniverseContractPath') + 'build/contracts/ && cp SkywalkerFungible.json EVMContract.json';
+            let cmd = 'cd ' + config.get('submodules.omniverseContractPath') + 'build/contracts/ && cp SkywalkerFungible.json EVMContract.json';
             execSync(cmd);
         }
         else {
-            let cmd = 'cd ' + config.get('omniverseContractPath') + 'build/contracts/ && cp SkywalkerNonFungible.json EVMContract.json';
+            let cmd = 'cd ' + config.get('submodules.omniverseContractPath') + 'build/contracts/ && cp SkywalkerNonFungible.json EVMContract.json';
             execSync(cmd);
         }
     }

@@ -22,11 +22,6 @@ module.exports = async function (deployer, network) {
   await deployer.deploy(SkywalkerFungible, CHAIN_IDS[network], "SKYWALKER", "SW");
   await deployer.deploy(SkywalkerNonFungible, CHAIN_IDS[network], "SKYWALKER", "SW");
 
-  // Update config
-  if (network.indexOf('-fork') != -1 || network == 'test' || network == 'development') {
-    return;
-  }
-
   jsonData[network].skywalkerFungibleAddress = SkywalkerFungible.address;
   jsonData[network].skywalkerNonFungibleAddress = SkywalkerNonFungible.address;
   fs.writeFileSync(contractAddressFile, JSON.stringify(jsonData, null, '\t'));

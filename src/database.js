@@ -1,3 +1,6 @@
+const config = require('config');
+const { exec, execSync } = require("child_process");
+
 class Database {
     constructor() {
 
@@ -5,37 +8,25 @@ class Database {
 
     updateDatabaseConfig() {
         console.log('updateDatabaseConfig');
-        let cfg = {
-            scanInterval: 1,
-            logLevel: 'debug',
-            secret: 'config/.secret',
-            database: "omniverse.db",
-            stateDB: ".state",
-            payload: {
-                keys: ["op", "exData", "amount"],
-                types: ["uint8", "bytes", "uint256"]
-            },
-            networks: {}
-        };
+        let cfg = JSON.parse(JSON.stringify(config.get("database")));
+        cfg.networks = {};
     
         for (let i in global.networks) {
-            let item = {};
+            let item;
             if (global.networks[i].chainType == 'EVM') {
+                item = JSON.parse(JSON.stringify(config.get("database.networkTemp.EVM")));
                 item.nodeAddress = global.networks[i].rpc;
-                item.chainId = 1337;
                 item.omniverseContractAddress = global.networks[i].EVMContract;
-                item.omniverseContractAbiPath = './res/EVMContract.json';
-                item.compatibleChain = 'ethereum';
                 item.omniverseChainId = networks[i].id;
             }
             cfg.networks[i] = item;
         }
-        fs.writeFileSync(config.get('databasePath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.databasePath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }
     
     updateDatabaseRes() {
         console.log('updateDatabaseRes');
-        execSync('mkdir -p ' + config.get('databasePath') + 'res && cp ' + config.get('omniverseContractPath') + 'build/contracts/EVMContract.json ' + config.get('databasePath') + 'res/EVMContract.json');
+        execSync('mkdir -p ' + config.get('submodules.databasePath') + 'res && cp ' + config.get('submodules.omniverseContractPath') + 'build/contracts/EVMContract.json ' + config.get('submodules.databasePath') + 'res/EVMContract.json');
     }
 
     beforeLaunch(contractType) {
@@ -47,7 +38,7 @@ class Database {
     launch(contractType) {
         this.beforeLaunch(contractType);
 
-        exec('cd ' + config.get('databasePath') + ' && node src/main.js > out.log');
+        exec('cd ' + config.get('submodules.databasePath') + ' && node src/main.js > out.log');
     }
 }
 

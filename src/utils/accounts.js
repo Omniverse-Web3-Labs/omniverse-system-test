@@ -1,4 +1,5 @@
 const eccrypto = require('eccrypto');
+const utils = require('./utils');
 
 class Accounts {
     constructor() {
@@ -18,8 +19,8 @@ class Accounts {
 
     init() {
         this.pks = [];
-        for (let i = 0; i < users.length; i++) {
-            let privateKeyBuffer = Buffer.from(utils.toByteArray(users[i]));
+        for (let i = 0; i < this.sks.length; i++) {
+            let privateKeyBuffer = Buffer.from(utils.toByteArray(this.sks[i]));
             let publicKeyBuffer = eccrypto.getPublic(privateKeyBuffer);
             let publicKey = '0x' + publicKeyBuffer.toString('hex').slice(2);
             this.pks.push(publicKey);
@@ -36,6 +37,10 @@ class Accounts {
 
     getUsers() {
         return [this.sks.slice(2), this.pks.slice(2)];
+    }
+
+    getAll() {
+        return [this.sks, this.pks];
     }
 }
 

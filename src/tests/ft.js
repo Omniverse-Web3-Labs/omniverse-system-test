@@ -1,25 +1,23 @@
 const { execSync } = require("child_process");
 const config = require('config');
 const utils = require('../utils/utils');
-const Web3 = require('web3');
 const fs = require('fs');
-const nodes = require('../nodes/index');
-const accounts = require('../utils/account');
+const accounts = require('../utils/accounts');
 const assert = require('assert');
 const base = require('./base');
 const synchronizer = require("../synchronizer");
 
 class Test {
-    initialize(networks) {
-        console.log('initialize');
+    initialize() {
+        console.log('initialize', global.networks);
         let allienceInfo = '';
         for (let i in global.networks) {
             let item;
             if (global.networks[i].chainType == 'EVM') {
-                item = '"' + i + '|' + global.networks[i].omniverseContractAddress + '"';
+                item = '"' + i + '|' + global.networks[i].EVMContract + '"';
             }
             
-            if (i == 0) {
+            if (allienceInfo == '') {
                 allienceInfo = item;
             }
             else {
@@ -29,8 +27,8 @@ class Test {
         let cmd;
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
-        for (let i = 0; i < networks.length; i++) {
-            cmd = 'cd ' + config.get('omniverseContractPath') + ' && node register/index.js -i CHAIN' + networks[i].id + ',' + allienceInfo;
+        for (let i in global.networks) {
+            cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + i + ',' + allienceInfo;
             execSync(cmd);
         }
     }
@@ -43,10 +41,10 @@ class Test {
         console.log('Test updateToolSecret');
         console.log('For EVM');
         let secretCfg = {};
-        secretCfg.sks = accounts.getUsers();
+        secretCfg.sks = accounts.getAll()[0];
         secretCfg.index = 0;
         secretCfg.mpc = secretCfg.sks[0];
-        fs.writeFileSync(config.get('omniverseToolPath') + 'register/.secret', JSON.stringify(secretCfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.omniverseToolPath') + 'register/.secret', JSON.stringify(secretCfg, null, '\t'));
     }
     
     updateToolRes() {
@@ -71,13 +69,13 @@ class Test {
         console.log('testRestore');
         for (let i in global.networks) {
             // Prepare for testing work restore
-            await this.beforeRestore();
+            await this.beforeRestore(global.networks[i]);
 
             // Launch synchronizer
             await synchronizer.launch();
 
             // Test work restore
-            await this.afterRestore();
+            await this.afterRestore(global.networks[i]);
 
             // Shut down synchronizer
             synchronizer.shutdown();
@@ -94,9 +92,9 @@ class Test {
         for (let i in global.networks) {
             base.mint(global.networks[i].chainType, i, users[1], 100);
             await utils.sleep(2);
-            base.transfer(global.networks[i].chainType, i, users[0], 100);
+            base.transfer(global.networks[i].chainType, i, 3, users[2], 100);
             await utils.sleep(2);
-            let ret = base.balanceOf(global.networks[i], i, users[0]);
+            let ret = await base.balanceOf(global.networks[i].chainType, i, users[0]);
             console.log('ret', ret.toString())
             assert(ret.includes('0'), 'Balance error');
         }
@@ -104,27 +102,30 @@ class Test {
 
     async runTest() {
         console.log('runTests');
+        synchronizer.prepare();
+
         await this.testRestore();
 
         await this.testFlow();
     }
 
     async beforeRestore(network) {
-        let users = accounts.getUsers()[1];
         console.log('beforeRestore');
+        let users = accounts.getUsers()[1];
         // Mint to user 0
-        base.mint(network.chainType, i, users[0], 100);
+        base.mint(network.chainType, network.chainName, users[0], 100);
         await utils.sleep(2);
 
-        let ret = base.balanceOf(network.chainType, i, users[0]);
+        let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())
         assert(ret.includes('0'), 'Balance error');
     }
 
     async afterRestore(network) {
         console.log('afterRestore');
+        let users = accounts.getUsers()[1];
 
-        let ret = base.balanceOf(network.chainType, i, users[0]);
+        let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())
         assert(ret.includes('100'), 'Balance error');
     }

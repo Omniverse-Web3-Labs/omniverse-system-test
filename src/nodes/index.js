@@ -1,18 +1,24 @@
 const EVMChain = require('./EVMChain');
+const config = require('config');
 
 class NodesMgr {
     constructor() {
         this.id = 0;
         this.nodesInfo = {};
+        this.startPort = 9500;
+    }
+
+    init() {
     }
 
     /**
      * @method launch Launch nodes for testing
      */
-    launch(networks) {
-        for (let i = 0; i < networks.length; i++) {
-            let port = this.launchChain(networks[i]);
-            this.nodesInfo[networks[i].id] = port;
+    launch() {
+        for (let i in global.networks) {
+            this.launchChain(global.networks[i]);
+            global.networks[i].rpc = 'http://127.0.0.1:' + this.startPort;
+            this.nodesInfo[i] = this.startPort;
         }
     }
 
@@ -23,15 +29,13 @@ class NodesMgr {
      */
     launchChain(chainInfo) {
         console.log('launchChain', chainInfo);
-        let port;
         if (chainInfo.chainType == 'EVM') {
-            port = EVMChain.launch(chainInfo.id);
+            EVMChain.launch(this.startPort++, chainInfo);
         }
-        return port;
     }
 
-    getNodePort(id) {
-        return this.nodesInfo[id];
+    getNodePort(chainName) {
+        return this.nodesInfo[chainName];
     }
 }
 

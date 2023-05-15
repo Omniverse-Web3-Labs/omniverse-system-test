@@ -1,17 +1,18 @@
 {
-    "omniverseContractPath": "./contracts/omniverse-evm/contracts/",
-    "omniverseToolPath": "./contracts/omniverse-evm/contracts/",
-    "synchronizerPath": "./omniverse-synchronizer/",
-    "databasePath": "./omniverse-database/",
-    "coolingDown": 1,
+    "submodules": {
+        "omniverseContractPath": "./contracts/omniverse-evm/contracts/",
+        "omniverseToolPath": "./contracts/omniverse-evm/contracts/",
+        "synchronizerPath": "./omniverse-synchronizer/",
+        "databasePath": "./omniverse-database/"
+    },
     "networks": [
         {
             "chainType": "EVM",
-            "secretKey": "0x0cc0c2de7e8c30525b4ca3b9e0b9703fb29569060d403261055481df7014f7fa"
+            "coolingDown": 1
         },
         {
             "chainType": "EVM",
-            "secretKey": "0x0cc0c2de7e8c30525b4ca3b9e0b9703fb29569060d403261055481df7014f7fa",
+            "coolingDown": 1,
             "count": 1
         }
     ]

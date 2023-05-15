@@ -45,13 +45,24 @@ async function main() {
     // Deploy contracts
     await contracts.deploy(networks);
 
+    // Update database config
+    coordinator.onLaunchDatabase(networks, process.argv[2]);
+    // Launch database
+    exec('cd ' + config.get('databasePath') + ' && node src/main.js > out.log');
+
+    // Update test config
+    coordinator.onTest(networks, users, process.argv[2]);
+
+    await tests.beforeRestore(networks, userPks, process.argv[2]);
+
     // Update synchronizer config
     coordinator.onLaunchSynchronizer(networks, process.argv[2]);
     // Launch synchronizer
-    exec('cd ' + config.get('synchronizerPath') + ' && node src/main.js > out.log');    
+    exec('cd ' + config.get('synchronizerPath') + ' && node src/main.js > out.log');
+    await utils.sleep(5);
 
-    // Update test config
-    coordinator.onTest(networks, users);
+    await tests.afterRestore(networks, userPks, process.argv[2]);    
+
     // Run test cases
     if (process.argv[2] == 'ft') {
         await tests.runFTTests(networks, userPks);

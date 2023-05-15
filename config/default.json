@@ -2,6 +2,7 @@
     "omniverseContractPath": "./contracts/omniverse-evm/contracts/",
     "omniverseToolPath": "./contracts/omniverse-evm/contracts/",
     "synchronizerPath": "./omniverse-synchronizer/",
+    "databasePath": "./omniverse-database/",
     "coolingDown": 1,
     "networks": [
         {

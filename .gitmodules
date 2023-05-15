@@ -4,3 +4,6 @@
 [submodule "contracts/omniverse-evm"]
 	path = contracts/omniverse-evm
 	url = git@virgil.github.com:Omniverse-Web3-Labs/omniverse-evm.git
+[submodule "omniverse-database"]
+	path = omniverse-database
+	url = git@virgil.github.com:Omniverse-Web3-Labs/omniverse-database.git

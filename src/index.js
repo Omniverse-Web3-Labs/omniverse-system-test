@@ -7,8 +7,7 @@ const accounts = require('./utils/accounts');
 const database = require('./database');
 const { program } = require('commander');
 const { execSync } = require("child_process");
-
-global.networks = {};
+global.networkMgr = require('./utils/networkMgr');
 
 function install() {
     console.log('install');
@@ -21,21 +20,8 @@ function install() {
 }
 
 async function init() {
-    let networks = config.get('networks');
-    let index = 1;
-    for (let i = 0; i < networks.length; ++i) {
-        if (networks[i].count) {
-            for (let j = 0; j < networks[i].count; j++) {
-                global.networks[index] = JSON.parse(JSON.stringify(networks[i]));
-                global.networks[index].chainName = index++;
-            }
-        }
-        else {
-            global.networks[index] = JSON.parse(JSON.stringify(networks[i]));
-            global.networks[index].chainName = index++;
-        }
-    }
     accounts.init();
+    global.networkMgr.init();
 }
 
 async function test(contractType) {

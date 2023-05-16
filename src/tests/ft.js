@@ -32,7 +32,7 @@ class Test {
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
         for (let i in global.networkMgr.networks) {
-            if (global.networkMgr.networks.chainType == 'EVM') {
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
                 cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + i + ',' + allienceInfo;
                 execSync(cmd);
             }

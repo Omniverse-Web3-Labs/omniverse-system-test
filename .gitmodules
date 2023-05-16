@@ -6,4 +6,4 @@
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-evm.git
 [submodule "submodules/omniverse-database"]
 	path = submodules/omniverse-database
-	url = https://github.com/Omniverse-Web3-Labs/omniverse-synchronizer.git
+	url = https://github.com/Omniverse-Web3-Labs/omniverse-database.git

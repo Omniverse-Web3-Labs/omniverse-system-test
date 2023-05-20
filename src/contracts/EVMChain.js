@@ -18,14 +18,13 @@ class EVMChainDeployer {
     updateConfig() {
         console.log('EVMChainDeployer update Config');
         let cfg = {};
-        for (let i in global.networks) {
+        let networks = global.networkMgr.getNetworksByType('EVM');
+        for (let i in networks) {
             let item = {};
-            if (global.networks[i].chainType == 'EVM') {
-                item.nodeAddress = global.networks[i].rpc;
-                item.chainId = 1337;
-                item.coolingDown = global.networks[i].coolingDown;
-                item.omniverseChainId = i;
-            }
+            item.nodeAddress = networks[i].rpc;
+            item.chainId = 1337;
+            item.coolingDown = networks[i].coolingDown;
+            item.omniverseChainId = i;
             cfg[i] = item;
         }
         fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
@@ -34,10 +33,9 @@ class EVMChainDeployer {
     updateMigrationScript() {
         console.log('EVMChainDeployer updateMigrationScript');
         let str = '';
-        for (let i in global.networks) {
-            if (global.networks[i].chainType == 'EVM') {
-                str += i + ': ' + i + ',\n';
-            }
+        let networks = global.networkMgr.getNetworksByType('EVM');
+        for (let i in networks) {
+            str += i + ': ' + i + ',\n';
         }
         console.log('migrate networks', str);
         let migrationScript = fs.readFileSync('./res/2_deploy_contracts.js').toString();
@@ -49,12 +47,11 @@ class EVMChainDeployer {
         console.log('EVMChainDeployer updateTruffleConfig');
         let str = '';
         let netConfig = 'CHAIN_NAME:{\nhost:`CHAIN_HOST`,\nport:`CHAIN_PORT`,\nnetwork_id: "*",},\n';
-        for (let i in global.networks) {
-            if (global.networks[i].chainType == 'EVM') {
-                str += netConfig.replace('CHAIN_NAME', i).
-                replace('CHAIN_HOST', '127.0.0.1').
-                replace('CHAIN_PORT', global.networks[i].port);
-            }
+        let networks = global.networkMgr.getNetworksByType('EVM');
+        for (let i in networks) {
+            str += netConfig.replace('CHAIN_NAME', i).
+            replace('CHAIN_HOST', '127.0.0.1').
+            replace('CHAIN_PORT', networks[i].port);
         }
         console.log('truffle networks', str);
         let truffleConfigStr = fs.readFileSync('./res/config/truffle-config.js').toString();

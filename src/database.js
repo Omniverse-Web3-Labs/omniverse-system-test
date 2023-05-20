@@ -11,13 +11,13 @@ class Database {
         let cfg = JSON.parse(JSON.stringify(config.get("database")));
         cfg.networks = {};
     
-        for (let i in global.networks) {
+        for (let i in global.networkMgr.networks) {
             let item;
-            if (global.networks[i].chainType == 'EVM') {
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = JSON.parse(JSON.stringify(config.get("database.networkTemp.EVM")));
-                item.nodeAddress = global.networks[i].rpc;
-                item.omniverseContractAddress = global.networks[i].EVMContract;
-                item.omniverseChainId = networks[i].id;
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
+                item.omniverseChainId = global.networkMgr.networks[i].id;
             }
             cfg.networks[i] = item;
         }

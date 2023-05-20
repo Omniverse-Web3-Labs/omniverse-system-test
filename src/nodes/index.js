@@ -15,10 +15,10 @@ class NodesMgr {
      * @method launch Launch nodes for testing
      */
     launch() {
-        for (let i in global.networks) {
-            this.launchChain(global.networks[i]);
-            global.networks[i].rpc = 'http://127.0.0.1:' + this.port;
-            global.networks[i].port = this.port;
+        for (let i in global.networkMgr.networks) {
+            this.launchChain(global.networkMgr.networks[i]);
+            global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
+            global.networkMgr.networks[i].port = this.port;
             this.nodesInfo[i] = this.port++;
         }
     }

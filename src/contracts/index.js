@@ -13,13 +13,13 @@ class ContractsMgr {
 
     async afterDeploy(contractType) {
         let omniverseCfg = JSON.parse(fs.readFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json').toString());
-        for (let i in global.networks) {
-            if (global.networks[i].chainType == 'EVM') {
+        for (let i in global.networkMgr.networks) {
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
                 if (contractType == 'ft') {
-                    global.networks[i].EVMContract = omniverseCfg[i].skywalkerFungibleAddress;
+                    global.networkMgr.networks[i].EVMContract = omniverseCfg[i].skywalkerFungibleAddress;
                 }
                 else {
-                    global.networks[i].EVMContract = omniverseCfg[i].skywalkerNonFungibleAddress;
+                    global.networkMgr.networks[i].EVMContract = omniverseCfg[i].skywalkerNonFungibleAddress;
                 }
             }
         }
@@ -37,9 +37,9 @@ class ContractsMgr {
     async deploy(contractType) {
         this.beforeDeploy();
 
-        for (let i in global.networks) {
-            if (global.networks[i].chainType == 'EVM') {
-                await EVMChain.deployOmniverse(global.networks[i]);
+        for (let i in global.networkMgr.networks) {
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
+                await EVMChain.deployOmniverse(global.networkMgr.networks[i]);
             }
         }
 

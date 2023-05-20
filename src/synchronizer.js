@@ -13,12 +13,12 @@ class Synchronizer {
         let cfg = JSON.parse(JSON.stringify(config.get("synchronizer")));
         cfg.networks = {};
         
-        for (let i in global.networks) {
+        for (let i in global.networkMgr.networks) {
             let item = {};
-            if (global.networks[i].chainType == 'EVM') {
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.EVM")));
-                item.nodeAddress = global.networks[i].rpc;
-                item.omniverseContractAddress = global.networks[i].EVMContract;
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
                 item.omniverseChainId = i;
             }
             cfg.networks[i] = item;
@@ -34,7 +34,7 @@ class Synchronizer {
     updateSecret() {
         console.log('Synchronizer updateSecret');
         let secretCfg = {};
-        for (let i in global.networks) {
+        for (let i in global.networkMgr.networks) {
             secretCfg[i] = accounts.getPorters()[0];
         }
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/.secret', JSON.stringify(secretCfg, null, '\t'));

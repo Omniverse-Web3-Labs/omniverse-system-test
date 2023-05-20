@@ -1,18 +1,54 @@
 {
-    "omniverseContractPath": "./contracts/omniverse-evm/contracts/",
-    "omniverseToolPath": "./contracts/omniverse-evm/contracts/",
-    "synchronizerPath": "./omniverse-synchronizer/",
-    "databasePath": "./omniverse-database/",
-    "coolingDown": 1,
+    "submodules": {
+        "omniverseContractPath": "./contracts/omniverse-evm/contracts/",
+        "omniverseToolPath": "./contracts/omniverse-evm/contracts/",
+        "synchronizerPath": "./omniverse-synchronizer/",
+        "databasePath": "./omniverse-database/"
+    },
     "networks": [
         {
             "chainType": "EVM",
-            "secretKey": "0x0cc0c2de7e8c30525b4ca3b9e0b9703fb29569060d403261055481df7014f7fa"
+            "coolingDown": 1
         },
         {
             "chainType": "EVM",
-            "secretKey": "0x0cc0c2de7e8c30525b4ca3b9e0b9703fb29569060d403261055481df7014f7fa",
+            "coolingDown": 1,
             "count": 1
         }
-    ]
+    ],
+    "database": {
+        "scanInterval": 1,
+        "logLevel": "debug",
+        "secret": "config/.secret",
+        "database": "omniverse.db",
+        "stateDB": ".state",
+        "payload": {
+            "keys": ["op", "exData", "amount"],
+            "types": ["uint8", "bytes", "uint256"]
+        },
+        "networkTemp": {
+            "EVM": {
+                "chainId": 1337,
+                "omniverseContractAbiPath": "./res/EVMContract.json",
+                "compatibleChain": "ethereum"
+            }
+        }
+    },
+    "synchronizer": {
+        "scanInterval": 1,
+        "logLevel": "debug",
+        "secret": "config/.secret",
+        "stateDB": ".state",
+        "payload": {
+            "keys": ["op", "exData", "amount"],
+            "types": ["uint8", "bytes", "uint256"]
+        },
+        "networkTemp": {
+            "EVM": {
+                "chainId": 1337,
+                "omniverseContractAbiPath": "./res/EVMContract.json",
+                "compatibleChain": "ethereum"
+            }
+        }
+    }
 }

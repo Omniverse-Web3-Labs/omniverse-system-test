@@ -64,6 +64,7 @@ async function evmMineOneBlock (provider) {
     });
 };
 
+
 async function sleep(seconds) {
     await new Promise((resolve) => {
         setTimeout(() => {
@@ -85,6 +86,27 @@ async function getBlock(web3js) {
     return block;
 }
 
+function toSubstrateAddress(publicKey) {
+    if (publicKey.substr(0, 2) == '0x') {
+      publicKey = publicKey.substr(2);
+    }
+  
+    const y = "0x" + publicKey.substring(64);
+    // console.log(y);
+  
+    const _1n = BigInt(1);
+    let flag = BigInt(y) & _1n ? '03' : '02';
+    // console.log(flag);
+  
+    const x = Buffer.from(publicKey.substring(0, 64), "hex");
+    // console.log(pubKey.substring(0, 64));
+    const finalX = Buffer.concat([Buffer.from([flag]), x]);
+    const finalXArray = new Uint8Array(finalX);
+    // console.log("Public Key: \n", finalXArray);
+    const addrHash = blake2AsHex(finalXArray);
+    return encodeAddress(addrHash);
+}
+
 module.exports = {
     stringToByteArray: stringToByteArray,
     toHexString: toHexString,
@@ -92,5 +114,6 @@ module.exports = {
     evmMine: evmMine,
     getBlock: getBlock,
     toByteArray: toByteArray,
-    sleep: sleep
+    sleep: sleep,
+    toSubstrateAddress
 }

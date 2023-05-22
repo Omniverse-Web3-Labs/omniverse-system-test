@@ -15,7 +15,10 @@ class Test {
             let item;
             if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = '"' + i + '|' + global.networkMgr.networks[i].EVMContract + '"';
+            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                item = '"' + i + '|' + global.networkMgr.networks[i].tokenId + '"';
             }
+            
             
             if (allienceInfo == '') {
                 allienceInfo = item;

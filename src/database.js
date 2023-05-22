@@ -18,6 +18,10 @@ class Database {
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
                 item.omniverseChainId = global.networkMgr.networks[i].id;
+            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                item = JSON.parse(JSON.stringify(config.get("database.networkTemp.SUBSTRATE")));
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.omniverseChainId = global.networkMgr.networks[i].id;
             }
             cfg.networks[i] = item;
         }

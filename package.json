@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@polkadot/api": "^10.7.2",
+    "@polkadot/keyring": "^12.2.1",
     "commander": "^10.0.1",
     "config": "^3.3.9",
     "eccrypto": "^1.1.6",

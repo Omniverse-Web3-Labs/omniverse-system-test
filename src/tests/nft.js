@@ -1,10 +1,8 @@
 const { execSync } = require("child_process");
 const config = require('config');
 const utils = require('../utils/utils');
-const Web3 = require('web3');
 const fs = require('fs');
-const nodes = require('../nodes/index');
-const accounts = require('../utils/account');
+const accounts = require('../utils/accounts');
 const assert = require('assert');
 
 class Test {    

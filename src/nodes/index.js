@@ -1,4 +1,5 @@
 const EVMChain = require('./EVMChain');
+const SustrateChain = require('./substrate');
 const config = require('config');
 
 class NodesMgr {
@@ -17,8 +18,13 @@ class NodesMgr {
     launch() {
         for (let i in global.networkMgr.networks) {
             this.launchChain(global.networkMgr.networks[i]);
-            global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
-            global.networkMgr.networks[i].port = this.port;
+            if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                global.networkMgr.networks[i].rpc = 'ws://3.122.90.113:' + 9944;
+                global.networkMgr.networks[i].port = 9944;
+            } else {
+                global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
+                global.networkMgr.networks[i].port = this.port;
+            }
             this.nodesInfo[i] = this.port++;
         }
     }
@@ -32,7 +38,10 @@ class NodesMgr {
         console.log('launchChain', chainInfo);
         if (chainInfo.chainType == 'EVM') {
             EVMChain.launch(this.port, chainInfo);
+        } else if (chainInfo.chainType == 'SUBSTRATE') {
+            SustrateChain.launch(this.port, chainInfo);
         }
+        
     }
 
     getNodePort(chainName) {

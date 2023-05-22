@@ -20,6 +20,10 @@ class Synchronizer {
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
                 item.omniverseChainId = i;
+            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.SUBSTRATE")));
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.omniverseChainId = i;
             }
             cfg.networks[i] = item;
         }

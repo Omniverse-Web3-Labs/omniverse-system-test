@@ -21,6 +21,7 @@ class Database {
             } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 item = JSON.parse(JSON.stringify(config.get("database.networkTemp.SUBSTRATE")));
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.tokenId = global.networkMgr.networks[i].tokenId;
                 item.omniverseChainId = global.networkMgr.networks[i].id;
             }
             cfg.networks[i] = item;

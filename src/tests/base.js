@@ -1,6 +1,7 @@
 const utils = require("../utils/utils");
 const config = require('config');
 const { execSync } = require("child_process");
+const { Keyring } = require('@polkadot/api');
 
 module.exports = {
     switchAccount(index) {
@@ -35,5 +36,15 @@ module.exports = {
             ret = execSync(cmd);
         }
         return ret;
+    },
+
+    async transferSubstrateOriginToken(api, to) {
+        {
+            let amount = BigInt('1000000000000000');
+            let keyring = new Keyring({ type: 'sr25519' });
+            let alice = keyring.addFromUri('//Alice');
+            let address = utils.toSubstrateAddress(to);
+            await api.tx.balances.transfer(address, amount).signAndSend(alice);
+        }
     }
 }

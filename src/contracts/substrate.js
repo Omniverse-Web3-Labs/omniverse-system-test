@@ -1,7 +1,5 @@
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
-const { encodeAddress, blake2AsU8a } = require('@polkadot/util-crypto');
 const accounts = require('../utils/accounts');
-const eccrypto = require('eccrypto');
 const utils = require('../utils/utils');
 class SubstrateDeployer {
   constructor() {
@@ -23,21 +21,16 @@ class SubstrateDeployer {
     {
       let keyring = new Keyring({ type: 'sr25519' });
       let alice = keyring.addFromUri('//Alice');
-      let userPublicKey = eccrypto.getPublicCompressed(
-        Buffer.from(utils.toByteArray(accounts.getUsers()[0]))
-      );
-      let user = encodeAddress(blake2AsU8a(userPublicKey));
       await api.tx.balances.transfer(owner.address, amount).signAndSend(alice);
-      await api.tx.balances.transfer(user, amount).signAndSend(alice);
     }
 
     if (contractType == 'ft') {
       await api.tx.assets
-        .createToken(accounts.getOwner()[1], chainInfo.tokenId)
+        .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
         .signAndSend(owner);
     } else {
       await api.tx.uniques
-        .createToken(accounts.getOwner()[1], chainInfo.tokenId)
+        .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
         .signAndSend(owner);
     }
   }

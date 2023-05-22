@@ -8,6 +8,7 @@ const database = require('./database');
 const { program } = require('commander');
 const { execSync } = require("child_process");
 global.networkMgr = require('./utils/networkMgr');
+global.Childs = [];
 
 function install() {
     console.log('install');
@@ -81,3 +82,10 @@ async function test(contractType) {
         test(program.opts().test);
     }
 }());
+
+// kill the child process
+process.on('exit', () => {
+    for (let child of Childs) {
+        child.kill();
+    }
+});

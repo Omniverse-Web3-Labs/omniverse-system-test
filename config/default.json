@@ -56,6 +56,10 @@
                 "chainId": 1337,
                 "omniverseContractAbiPath": "./res/EVMContract.json",
                 "compatibleChain": "ethereum"
+            },
+            "SUBSTRATE": {
+                "chainId": 1,
+                "compatibleChain": "substrate"
             }
         }
     }

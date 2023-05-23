@@ -12,13 +12,13 @@ class Test {
         console.log('initialize', global.networkMgr.networks);
         let allienceInfo = '';
         for (let i in global.networkMgr.networks) {
-            let item;
+            let item = '';
             if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = '"' + i + '|' + global.networkMgr.networks[i].EVMContract + '"';
             } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                item = '"' + i + '|' + global.networkMgr.networks[i].tokenId + '"';
+                let tokenId = '0x' + Buffer.from(global.networkMgr.networks[i].tokenId).toString('hex');
+                item = '"' + i + '|' + tokenId + '"';
             }
-            
             
             if (allienceInfo == '') {
                 allienceInfo = item;
@@ -31,8 +31,10 @@ class Test {
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
         for (let i in global.networkMgr.networks) {
-            cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + i + ',' + allienceInfo;
-            execSync(cmd);
+            if (global.networkMgr.networks.chainType == 'EVM') {
+                cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + i + ',' + allienceInfo;
+                execSync(cmd);
+            }
         }
     }
 

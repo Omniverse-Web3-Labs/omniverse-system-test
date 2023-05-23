@@ -11,7 +11,13 @@ class Test {
         let synchronizerCfg = JSON.parse(fs.readFileSync(config.get('synchronizerPath') + 'config/default.json').toString()).networks;
         let allienceInfo = '';
         for (let i = 0; i < networks.length; i++) {
-            let item = '"' + networks[i].id + '|' + synchronizerCfg['CHAIN' + networks[i].id].omniverseContractAddress + '"';
+            let item = '';;
+            if (networks[i].chainType == 'EVM') {
+                item = '"' + networks[i].id + '|' + synchronizerCfg['CHAIN' + networks[i].id].omniverseContractAddress + '"';
+            } else if (networks[i].chainType == 'SUBSTRATE') {
+                let tokenId = '0x' + Buffer.from(synchronizerCfg['CHAIN' + networks[i].id].tokenId).toString('hex');
+                item = '"' + networks[i].id + '|' + tokenId + '"';
+            }
             if (i == 0) {
                 allienceInfo = item;
             }
@@ -23,8 +29,10 @@ class Test {
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
         for (let i = 0; i < networks.length; i++) {
-            cmd = 'cd ' + config.get('omniverseContractPath') + ' && node register/nft.js -i CHAIN' + networks[i].id + ',http://,' + allienceInfo;
-            execSync(cmd);
+            if (networks[i].chainType == 'EVM') {
+                cmd = 'cd ' + config.get('omniverseContractPath') + ' && node register/nft.js -i CHAIN' + networks[i].id + ',http://,' + allienceInfo;
+                execSync(cmd);
+            }
         }
     }
 

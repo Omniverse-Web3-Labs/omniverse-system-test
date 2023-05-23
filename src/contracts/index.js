@@ -54,7 +54,6 @@ class ContractsMgr {
         }
 
         this.afterDeploy(contractType);
-        await SubstrateChain.afterDeploy(contractType);
     }
 }
 

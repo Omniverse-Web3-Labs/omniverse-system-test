@@ -19,12 +19,11 @@ class NodesMgr {
         for (let i in global.networkMgr.networks) {
             this.launchChain(global.networkMgr.networks[i]);
             if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                global.networkMgr.networks[i].rpc = 'ws://3.122.90.113:' + 9944;
-                global.networkMgr.networks[i].port = 9944;
+                global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
             } else {
                 global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
-                global.networkMgr.networks[i].port = this.port;
             }
+            global.networkMgr.networks[i].port = this.port;
             this.nodesInfo[i] = this.port++;
         }
     }
@@ -39,7 +38,7 @@ class NodesMgr {
         if (chainInfo.chainType == 'EVM') {
             Childs.push(EVMChain.launch(this.port, chainInfo));
         } else if (chainInfo.chainType == 'SUBSTRATE') {
-            SustrateChain.launch(this.port, chainInfo);
+            Childs.push(SustrateChain.launch(this.port, chainInfo));
         }
         
     }

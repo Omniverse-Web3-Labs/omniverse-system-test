@@ -6,9 +6,10 @@ const accounts = require('../utils/accounts');
 const assert = require('assert');
 const base = require('./base');
 const synchronizer = require("../synchronizer");
+const SubstrateChain = require('../contracts/substrate')
 
 class Test {
-    initialize() {
+    async initialize() {
         console.log('initialize', global.networkMgr.networks);
         let allienceInfo = '';
         for (let i in global.networkMgr.networks) {
@@ -36,6 +37,8 @@ class Test {
                 execSync(cmd);
             }
         }
+
+        await SubstrateChain.setMembers('ft');
     }
 
     updateToolConfig() {
@@ -59,7 +62,7 @@ class Test {
         // execSync('cd ' + config.get('') + ' && echo -n ' + '' + ' > .secret');
     }
 
-    prepare() {
+    async prepare() {
         console.log('Test prepare');
         this.updateToolConfig();
 
@@ -67,7 +70,7 @@ class Test {
 
         this.updateToolRes();
 
-        this.initialize();
+        await this.initialize();
     }
 
     async testRestore() {
@@ -92,11 +95,16 @@ class Test {
         let users = accounts.getUsers()[1];
         // Launch synchronizer
         await synchronizer.launch();
+        for (let i in networkMgr.networks) {
+            if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                await base.transferSubstrateOriginToken(networkMgr.networks[i], users);
+            }
+        }
         // Mint token to user 1
         console.log('Mint token');
         let index = 1;
         for (let i in global.networkMgr.networks) {
-            base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
+            await base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
             await utils.sleep(2);
             base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
             await utils.sleep(2);

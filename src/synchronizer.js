@@ -8,7 +8,7 @@ class Synchronizer {
 
     }
 
-    updateConfig() {
+    updateConfig(contractType) {
         console.log('Synchronizer updateConfig');
         let cfg = JSON.parse(JSON.stringify(config.get("synchronizer")));
         cfg.networks = {};
@@ -23,7 +23,13 @@ class Synchronizer {
             } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.SUBSTRATE")));
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.tokenId = global.networkMgr.networks[i].tokenId;
                 item.omniverseChainId = i;
+                if (contractType == 'ft') {
+                    item.pallets = ['assets'];
+                } else {
+                    item.pallets = ['uniques'];
+                }
             }
             cfg.networks[i] = item;
         }
@@ -44,8 +50,8 @@ class Synchronizer {
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/.secret', JSON.stringify(secretCfg, null, '\t'));
     }
 
-    prepare() {
-        this.updateConfig();
+    prepare(contractType) {
+        this.updateConfig(contractType);
 
         this.updateRes();
 

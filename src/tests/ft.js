@@ -117,7 +117,7 @@ class Test {
 
     async runTest() {
         console.log('runTests');
-        synchronizer.prepare();
+        synchronizer.prepare('ft');
 
         // await this.testRestore();
 

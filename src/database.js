@@ -6,7 +6,7 @@ class Database {
 
     }
 
-    updateDatabaseConfig() {
+    updateDatabaseConfig(contractType) {
         console.log('updateDatabaseConfig');
         let cfg = JSON.parse(JSON.stringify(config.get("database")));
         cfg.networks = {};
@@ -23,6 +23,11 @@ class Database {
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.tokenId = global.networkMgr.networks[i].tokenId;
                 item.omniverseChainId = global.networkMgr.networks[i].id;
+                if (contractType == 'ft') {
+                    item.pallets = ['assets'];
+                } else {
+                    item.pallets = ['uniques'];
+                }
             }
             cfg.networks[i] = item;
         }

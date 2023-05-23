@@ -17,6 +17,9 @@ class NodesMgr {
      */
     launch() {
         for (let i in global.networkMgr.networks) {
+            if (global.networkMgr.networks[i].rpc) {
+                continue;
+            }
             this.launchChain(global.networkMgr.networks[i]);
             if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;

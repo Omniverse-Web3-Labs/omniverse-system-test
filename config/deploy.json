@@ -1,24 +1,24 @@
 {
     "submodules": {
-        "omniverseContractPath": "./submodules/omniverse-evm/contracts/",
-        "omniverseToolPath": "./submodules/omniverse-evm/contracts/",
-        "synchronizerPath": "./submodules/omniverse-synchronizer/",
-        "databasePath": "./submodules/omniverse-database/"
+        "omniverseContractPath": "../omniverse-evm/contracts/",
+        "omniverseToolPath": "../omniverse-evm/contracts/",
+        "synchronizerPath": "../omniverse-synchronizer/",
+        "databasePath": "../omniverse-database/"
     },
+    "accounts": [
+        
+    ],
     "networks": [
         {
+            "rpc": "",
             "chainId": 1337,
             "chainType": "EVM",
             "coolingDown": 1
         },
         {
+            "rpc": "",
             "chainId": 1337,
             "chainType": "EVM",
-            "coolingDown": 1,
-            "count": 1
-        },
-        {
-            "chainType": "SUBSTRATE",
             "coolingDown": 1,
             "count": 1
         }
@@ -58,7 +58,6 @@
                 "compatibleChain": "ethereum"
             },
             "SUBSTRATE": {
-                "chainId": 1,
                 "compatibleChain": "substrate"
             }
         }

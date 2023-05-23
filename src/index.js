@@ -25,7 +25,7 @@ async function init() {
     global.networkMgr.init();
 }
 
-async function test(contractType) {
+async function deploy(contractType) {
     let tests;
     if (contractType == 'ft') {
         tests = ftTest;
@@ -61,6 +61,22 @@ async function test(contractType) {
     //                  Initialize Tests                  //
     ////////////////////////////////////////////////////////
     await tests.prepare();
+}
+
+async function test(contractType) {
+    let tests;
+    if (contractType == 'ft') {
+        tests = ftTest;
+    }
+    else if (contractType == 'nft') {
+        tests = nftTest;
+    }
+    else {
+        console.log('Contract type error');
+    }
+
+    // Deploy
+    await deploy(contractType);
 
     // Run test cases
     await tests.runTest();
@@ -73,6 +89,7 @@ async function test(contractType) {
         .version('0.1.0')
         .option('-i, --install', 'Install environment')
         .option('-t, --test <app name>', 'Test application')
+        .option('-d, --deploy', 'Deploy contracts')
         .parse(process.argv);
 
     if (program.opts().install) {
@@ -80,6 +97,9 @@ async function test(contractType) {
     }
     else if (program.opts().test) {
         await test(program.opts().test);
+    }
+    else if (program.opts().deploy) {
+        await deploy(program.opts().test);
     }
 }());
 

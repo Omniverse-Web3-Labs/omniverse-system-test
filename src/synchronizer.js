@@ -17,11 +17,13 @@ class Synchronizer {
             let item = {};
             if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.EVM")));
+                item.chainId = global.networkMgr.networks[i].chainId;
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
                 item.omniverseChainId = i;
             } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.SUBSTRATE")));
+                item.chainId = global.networkMgr.networks[i].chainId;
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.tokenId = global.networkMgr.networks[i].tokenId;
                 item.omniverseChainId = i;

@@ -4,9 +4,10 @@ const utils = require('../utils/utils');
 const fs = require('fs');
 const accounts = require('../utils/accounts');
 const assert = require('assert');
+const SubstrateChain = require('../contracts/substrate')
 
 class Test {    
-    initialize(networks) {
+    async initialize(networks) {
         console.log('initialize');
         let synchronizerCfg = JSON.parse(fs.readFileSync(config.get('synchronizerPath') + 'config/default.json').toString()).networks;
         let allienceInfo = '';
@@ -34,6 +35,7 @@ class Test {
                 execSync(cmd);
             }
         }
+        await SubstrateChain.setMembers('nft');
     }
 
     updateToolConfig() {
@@ -57,7 +59,7 @@ class Test {
         // execSync('cd ' + config.get('') + ' && echo -n ' + '' + ' > .secret');
     }
 
-    prepare() {
+    async prepare() {
         console.log('Test prepare');
         this.updateToolConfig();
 
@@ -65,7 +67,7 @@ class Test {
 
         this.updateToolRes();
 
-        this.initialize(networks, users);
+        await this.initialize(networks, users);
     }
 
     async runTest(networks, users, contractType) {

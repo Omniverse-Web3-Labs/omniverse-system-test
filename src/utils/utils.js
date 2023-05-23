@@ -1,3 +1,4 @@
+const { encodeAddress, blake2AsHex } = require('@polkadot/util-crypto');
 const expectThrow = async (promise, message) => {
     try {
         await promise;

@@ -1,7 +1,7 @@
-const { exec } = require("child_process");
+const { spawn } = require("child_process");
 
 module.exports = {
   launch: function(port, chainInfo) {
-    // exec('node-template --dev --tmp --ws-port ' + port);
+    return spawn('./bin/node-template', ['--dev', '--tmp', '--ws-port', port], { detached: true });
   },
 }

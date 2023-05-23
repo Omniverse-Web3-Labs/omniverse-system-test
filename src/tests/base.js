@@ -1,7 +1,7 @@
 const utils = require("../utils/utils");
 const config = require('config');
 const { execSync } = require("child_process");
-const { Keyring } = require('@polkadot/api');
+const { ApiPromise, Keyring, WsProvider } = require('@polkadot/api');
 
 module.exports = {
     switchAccount(index) {
@@ -38,13 +38,21 @@ module.exports = {
         return ret;
     },
 
-    async transferSubstrateOriginToken(api, to) {
-        {
-            let amount = BigInt('1000000000000000');
-            let keyring = new Keyring({ type: 'sr25519' });
-            let alice = keyring.addFromUri('//Alice');
-            let address = utils.toSubstrateAddress(to);
+    async transferSubstrateOriginToken(network, users) {
+        let provider = new WsProvider(network.rpc);
+        let api = await ApiPromise.create({
+            provider,
+            noInitWarn: true,
+        });
+        let amount = BigInt('1000000000000000');
+        let keyring = new Keyring({ type: 'sr25519' });
+        let alice = keyring.addFromUri('//Alice');
+        for (let user of users) {
+            let address = utils.toSubstrateAddress(user);
             await api.tx.balances.transfer(address, amount).signAndSend(alice);
+            console.log('Substrate waiting for in block');
+            await utils.sleep(10);
         }
+        
     }
 }

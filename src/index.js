@@ -60,7 +60,7 @@ async function test(contractType) {
     ////////////////////////////////////////////////////////
     //                  Initialize Tests                  //
     ////////////////////////////////////////////////////////
-    tests.prepare();
+    await tests.prepare();
 
     // Run test cases
     await tests.runTest();
@@ -79,7 +79,7 @@ async function test(contractType) {
         install();
     }
     else if (program.opts().test) {
-        test(program.opts().test);
+        await test(program.opts().test);
     }
 }());
 

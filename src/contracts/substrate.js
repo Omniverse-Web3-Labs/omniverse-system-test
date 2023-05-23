@@ -21,21 +21,29 @@ class SubstrateDeployer {
     {
       let keyring = new Keyring({ type: 'sr25519' });
       let alice = keyring.addFromUri('//Alice');
-      await api.tx.balances.transfer(owner.address, amount).signAndSend(alice);
+      await api.tx.balances
+        .transfer(owner.address, amount)
+        .signAndSend(alice, async ({ status, events }) => {
+          // console.log(status.isInBlock, status.isFinalized);
+          if (status.isInBlock) {
+            if (contractType == 'ft') {
+              await api.tx.assets
+                .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
+                .signAndSend(owner);
+            } else {
+              await api.tx.uniques
+                .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
+                .signAndSend(owner);
+            }
+          }
+        });
     }
-
-    if (contractType == 'ft') {
-      await api.tx.assets
-        .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
-        .signAndSend(owner);
-    } else {
-      await api.tx.uniques
-        .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
-        .signAndSend(owner);
-    }
+    console.log('Substrate waiting for in block');
+    await utils.sleep(5);
   }
 
-  async afterDeploy(contractType) {
+  async setMembers(contractType) {
+    console.log('Substrate set members');
     let keyring = new Keyring({ type: 'ecdsa' });
     let owner = keyring.addFromSeed(
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))

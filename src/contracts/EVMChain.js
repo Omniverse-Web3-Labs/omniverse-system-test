@@ -46,12 +46,11 @@ class EVMChainDeployer {
     updateTruffleConfig() {
         console.log('EVMChainDeployer updateTruffleConfig');
         let str = '';
-        let netConfig = 'CHAIN_NAME:{\nhost:`CHAIN_HOST`,\nport:`CHAIN_PORT`,\nnetwork_id: "*",},\n';
+        let netConfig = 'CHAIN_NAME:{\nprovider:()=>new HDWalletProvider(mnemonic, `CHAIN_RPC`),\nnetwork_id:"*"\n},\n';
         let networks = global.networkMgr.getNetworksByType('EVM');
         for (let i in networks) {
             str += netConfig.replace('CHAIN_NAME', i).
-            replace('CHAIN_HOST', '127.0.0.1').
-            replace('CHAIN_PORT', networks[i].port);
+            replace('CHAIN_RPC', networks[i].rpc);
         }
         console.log('truffle networks', str);
         let truffleConfigStr = fs.readFileSync('./res/config/truffle-config.js').toString();
@@ -61,7 +60,7 @@ class EVMChainDeployer {
 
     async deployOmniverse(chainInfo) {
         console.log('deployOmniverse', chainInfo);
-        execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[1] + " > .secret");
+        execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[0].slice(2) + " > .secret");
 
         let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName;
         execSync(cmd);

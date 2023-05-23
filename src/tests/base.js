@@ -38,7 +38,7 @@ module.exports = {
         return ret;
     },
 
-    async transferSubstrateOriginToken(network, users) {
+    async transferSubstrateOriginToken(network, users, porter) {
         let provider = new WsProvider(network.rpc);
         let api = await ApiPromise.create({
             provider,
@@ -53,6 +53,9 @@ module.exports = {
             console.log('Substrate waiting for in block');
             await utils.sleep(10);
         }
-        
+        let address = utils.toSubstrateAddress(porter);
+        await api.tx.balances.transfer(address, amount).signAndSend(alice);
+        console.log('Substrate waiting for in block');
+        await utils.sleep(10);
     }
 }

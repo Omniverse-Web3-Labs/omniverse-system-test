@@ -39,7 +39,7 @@ class SubstrateDeployer {
         });
     }
     console.log('Substrate waiting for in block');
-    await utils.sleep(5);
+    await utils.sleep(10);
   }
 
   async setMembers(contractType) {

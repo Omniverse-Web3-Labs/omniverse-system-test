@@ -86,6 +86,6 @@ async function test(contractType) {
 // kill the child process
 process.on('exit', () => {
     for (let child of Childs) {
-        child.kill();
+        process.kill(child.pid);
     }
 });

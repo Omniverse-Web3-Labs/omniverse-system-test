@@ -93,11 +93,12 @@ class Test {
     async testFlow() {
         console.log('testFlow');
         let users = accounts.getUsers()[1];
+        let porter = accounts.getPorters()[1];
         // Launch synchronizer
         await synchronizer.launch();
         for (let i in networkMgr.networks) {
             if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                await base.transferSubstrateOriginToken(networkMgr.networks[i], users);
+                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, porter);
             }
         }
         // Mint token to user 1
@@ -105,9 +106,9 @@ class Test {
         let index = 1;
         for (let i in global.networkMgr.networks) {
             await base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
-            await utils.sleep(2);
-            base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
-            await utils.sleep(2);
+            await utils.sleep(5);
+            await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
+            await utils.sleep(5);
             let ret = await base.balanceOf(global.networkMgr.networks[i].chainType, i, users[2]);
             console.log('ret', ret.toString());
             assert(ret.includes((11 * index).toString()), 'Balance error');

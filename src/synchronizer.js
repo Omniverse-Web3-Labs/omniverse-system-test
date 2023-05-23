@@ -65,7 +65,7 @@ class Synchronizer {
     async launch() {
         exec('cd ' + config.get('submodules.synchronizerPath') + ' && rm .state');
 
-        exec('cd ' + config.get('submodules.synchronizerPath') + ' && node ' + config.get('submodules.synchronizerPath') + 'src/main.js > sync.log');
+        exec('cd ' + config.get('submodules.synchronizerPath') + ' && node src/main.js > sync.log');
         await utils.sleep(5);
     }
 

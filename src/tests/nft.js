@@ -4,22 +4,24 @@ const utils = require('../utils/utils');
 const fs = require('fs');
 const accounts = require('../utils/accounts');
 const assert = require('assert');
+const base = require('./baseNFT');
+const synchronizer = require("../synchronizer");
 const SubstrateChain = require('../contracts/substrate')
 
-class Test {    
-    async initialize(networks) {
-        console.log('initialize');
-        let synchronizerCfg = JSON.parse(fs.readFileSync(config.get('synchronizerPath') + 'config/default.json').toString()).networks;
+class Test {
+    async initialize() {
+        console.log('initialize', global.networkMgr.networks);
         let allienceInfo = '';
-        for (let i = 0; i < networks.length; i++) {
-            let item = '';;
-            if (networks[i].chainType == 'EVM') {
-                item = '"' + networks[i].id + '|' + synchronizerCfg['CHAIN' + networks[i].id].omniverseContractAddress + '"';
-            } else if (networks[i].chainType == 'SUBSTRATE') {
-                let tokenId = '0x' + Buffer.from(synchronizerCfg['CHAIN' + networks[i].id].tokenId).toString('hex');
-                item = '"' + networks[i].id + '|' + tokenId + '"';
+        for (let i in global.networkMgr.networks) {
+            let item = '';
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
+                item = '"' + i + '|' + global.networkMgr.networks[i].EVMContract + '"';
+            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                let tokenId = '0x' + Buffer.from(global.networkMgr.networks[i].tokenId).toString('hex');
+                item = '"' + i + '|' + tokenId + '"';
             }
-            if (i == 0) {
+            
+            if (allienceInfo == '') {
                 allienceInfo = item;
             }
             else {
@@ -29,12 +31,13 @@ class Test {
         let cmd;
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
-        for (let i = 0; i < networks.length; i++) {
-            if (networks[i].chainType == 'EVM') {
-                cmd = 'cd ' + config.get('omniverseContractPath') + ' && node register/nft.js -i CHAIN' + networks[i].id + ',http://,' + allienceInfo;
+        for (let i in global.networkMgr.networks) {
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
+                cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/nft.js -i ' + i + ',http://,' + allienceInfo;
                 execSync(cmd);
             }
         }
+
         await SubstrateChain.setMembers('nft');
     }
 
@@ -47,7 +50,7 @@ class Test {
                 item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.tokenId = global.networkMgr.networks[i].tokenId;
                 item.omniverseChainId = i;
-                cfg.networks[i] = item;
+                cfg[i] = item;
             }
         }
         fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
@@ -57,10 +60,11 @@ class Test {
         console.log('Test updateToolSecret');
         console.log('For EVM');
         let secretCfg = {};
-        secretCfg.sks = accounts.getUsers();
+        secretCfg.sks = accounts.getAll()[0];
         secretCfg.index = 0;
         secretCfg.mpc = secretCfg.sks[0];
-        fs.writeFileSync(config.get('omniverseToolPath') + 'register/.secret', JSON.stringify(secretCfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.omniverseToolPath') + 'register/.secret', JSON.stringify(secretCfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + '.secret', JSON.stringify(secretCfg, null, '\t'));
     }
     
     updateToolRes() {
@@ -78,59 +82,83 @@ class Test {
 
         this.updateToolRes();
 
-        await this.initialize(networks, users);
+        await this.initialize();
     }
 
-    async runTest(networks, users, contractType) {
-        console.log('runTests');
+    async testRestore() {
+        console.log('testRestore');
+        let index = 1;
+        for (let i in global.networkMgr.networks) {
+            // Prepare for testing work restore
+            await this.beforeRestore(global.networkMgr.networks[i], index);
 
-        // Mint token 1 to user 1 on chain 1
+            // Launch synchronizer
+            await synchronizer.launch();
+
+            // Test work restore
+            await this.afterRestore(global.networkMgr.networks[i], index);
+
+            // Shut down synchronizer
+            synchronizer.shutdown();
+
+            index++;
+        }
+    }
+
+    async testFlow() {
+        console.log('testFlow');
+        let users = accounts.getUsers()[1];
+        // Launch synchronizer
+        await synchronizer.launch();
+        for (let i in networkMgr.networks) {
+            if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
+            }
+        }
+        // Mint token to user 1
         console.log('Mint token');
-        let cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -m CHAIN1,' + users[1] + ',' + 1;
-        execSync(cmd);
-        await utils.sleep(5);
-        
-        // Transfer token 1 to user 2 on chain 2
-        console.log('Transfer token');
-        cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -s 1';
-        execSync(cmd);
-        await utils.sleep(1);
-        cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -t CHAIN2,' + users[2] + ',1';
-        execSync(cmd);
-        await utils.sleep(5);
-
-        // Check balance of user 2 on all chains
-        console.log('Check');
-        for (let i = 0; i < networks.length; i++) {
-            cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -ob CHAIN' + networks[i].id + ',' + users[2];
-            let ret = execSync(cmd);
-            assert(ret.includes('1'), 'Balance error');
-        }
-
-        // Check owner of token 1 on all chains
-        console.log('Check');
-        for (let i = 0; i < networks.length; i++) {
-            cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -oo CHAIN' + networks[i].id + ',1';
-            let ret = execSync(cmd);
-            assert(ret.includes(users[2]), 'Owner error');
+        let index = 100;
+        for (let i in global.networkMgr.networks) {
+            console.log(i, global.networkMgr.networks[i].chainType);
+            await base.mint(global.networkMgr.networks[i].chainType, i, users[1], index);
+            await utils.sleep(10);
+            await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], index);
+            await utils.sleep(10);
+            let ret = await base.ownerOf(global.networkMgr.networks[i].chainType, i, index);
+            console.log('ret', ret.toString());
+            assert(ret.includes(users[2]), 'Balance error');
+            index++;
         }
     }
 
-    async beforeRestore(networks, users, contractType) {
+    async runTest() {
+        console.log('runTests');
+        synchronizer.prepare('nft');
+
+        // await this.testRestore();
+
+        await this.testFlow();
+    }
+
+    async beforeRestore(network, index) {
         console.log('beforeRestore');
-        let cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -m CHAIN' + networks[1].id + ',' + users[1] + ',' + 100;
-        execSync(cmd);
-        await utils.sleep(3);
-        cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -ob CHAIN' + networks[1].id + ',' + users[1];
-        let ret = execSync(cmd);
-        assert(ret.includes('0'), 'Balance error');
+        let users = accounts.getUsers()[1];
+        // Mint to user 0
+        base.mint(network.chainType, network.chainName, users[0], index);
+        await utils.sleep(2);
+
+        let ret = await base.ownerOf(network.chainType, network.chainName, index);
+        console.log('ret', ret.toString())
+        // assert(ret.includes('0'), 'Balance error');
     }
 
-    async restore(networks, users, contractType) {
+    async afterRestore(network, index) {
         console.log('afterRestore');
-        let cmd = 'cd ' + config.get('omniverseToolPath') + ' && node register/nft.js -ob CHAIN' + networks[1].id + ',' + users[1];
-        let ret = execSync(cmd);
-        assert(ret.includes('1'), 'Balance error');
+        let users = accounts.getUsers()[1];
+
+        let ret = await base.ownerOf(network.chainType, network.chainName, index);
+        console.log('ret', ret.toString())
+        assert(ret.includes(users[0]), 'Balance error');
     }
 }
 

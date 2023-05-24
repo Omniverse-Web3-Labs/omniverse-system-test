@@ -49,6 +49,7 @@
         "logLevel": "debug",
         "secret": "config/.secret",
         "stateDB": ".state",
+        "database": "http://127.0.0.1:8866/ominverse/v1/pending",
         "payload": {
             "keys": ["op", "exData", "amount"],
             "types": ["uint8", "bytes", "uint256"]

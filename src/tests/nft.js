@@ -39,7 +39,18 @@ class Test {
     }
 
     updateToolConfig() {
-        // console.log('updateToolConfig');
+        console.log('updateToolConfig');
+        let cfg = {};
+        for (let i in global.networkMgr.networks) {
+            let item = {};
+            if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.tokenId = global.networkMgr.networks[i].tokenId;
+                item.omniverseChainId = i;
+                cfg.networks[i] = item;
+            }
+        }
+        fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }
     
     updateToolSecret() {

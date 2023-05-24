@@ -3,6 +3,7 @@
         "omniverseContractPath": "./submodules/omniverse-evm/contracts/",
         "omniverseToolPath": "./submodules/omniverse-evm/contracts/",
         "synchronizerPath": "./submodules/omniverse-synchronizer/",
+        "substrateOmniverseToolPath": "./submodules/omniverse-swap-tools/omniverse-helper/",
         "databasePath": "./submodules/omniverse-database/"
     },
     "networks": [

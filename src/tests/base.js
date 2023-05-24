@@ -16,6 +16,12 @@ module.exports = {
             cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -m ' + chainName + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(2);
+        } else if (chainType == 'SUBSTRATE') {
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s 0';
+            execSync(cmd);
+            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -m ' + chainName + ',' + to + ',' + token;
+            execSync(cmd);
+            await utils.sleep(3);
         }
     },
 
@@ -26,13 +32,22 @@ module.exports = {
             cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -t ' + chainName + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(2);
+        } else if (chainType == 'SUBSTRATE') {
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s ' + fromIndex;
+            execSync(cmd);
+            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -t ' + chainName + ',' + to + ',' + token;
+            execSync(cmd);
+            await utils.sleep(3);
         }
     },
 
     async balanceOf(chainType, chainName, account) {
         let ret;
         if (chainType == 'EVM') {
-            cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -ob ' + chainName + ',' + account;
+            let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -ob ' + chainName + ',' + account;
+            ret = execSync(cmd);
+        } else if (chainType == 'SUBSTRATE') {
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -o ' + chainName + ',' + account;
             ret = execSync(cmd);
         }
         return ret;

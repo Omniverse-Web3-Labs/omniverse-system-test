@@ -12,22 +12,20 @@ class Database {
         cfg.networks = {};
     
         for (let i in global.networkMgr.networks) {
-            let item;
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
-                item = JSON.parse(JSON.stringify(config.get("database.networkTemp.EVM")));
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
-                item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
-                item.omniverseChainId = global.networkMgr.networks[i].id;
-            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                item = JSON.parse(JSON.stringify(config.get("database.networkTemp.SUBSTRATE")));
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
+            let network = global.networkMgr.networks[i];
+            let item = JSON.parse(JSON.stringify(config.get(`database.networkTemp.${network.chainType}`)));
+            item.nodeAddress = network.rpc;
+            item.omniverseChainId = network.omniverseChainId;
+            if (network.chainType == 'EVM') {
+                item.omniverseContractAddress = network.EVMContract;
+            } else if (network.chainType == 'SUBSTRATE') {
                 item.tokenId = global.networkMgr.networks[i].tokenId;
-                item.omniverseChainId = global.networkMgr.networks[i].id;
                 if (contractType == 'ft') {
                     item.pallets = ['assets'];
                 } else {
                     item.pallets = ['uniques'];
                 }
+                console.log(item);
             }
             cfg.networks[i] = item;
         }

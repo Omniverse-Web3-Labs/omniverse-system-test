@@ -18,6 +18,8 @@ function install() {
     execSync(cmd);
     cmd = "cd " + config.get('submodules.databasePath') + " && npm install";
     execSync(cmd);
+    cmd = "cd " + config.get('submodules.substrateOmniverseToolPath') + " && npm install";
+    execSync(cmd);
 }
 
 async function init() {
@@ -55,7 +57,7 @@ async function deploy(contractType) {
     ////////////////////////////////////////////////////////
     //                  Launch Database                   //
     ////////////////////////////////////////////////////////
-    database.launch();
+    database.launch(contractType);
 
     ////////////////////////////////////////////////////////
     //                  Initialize Tests                  //

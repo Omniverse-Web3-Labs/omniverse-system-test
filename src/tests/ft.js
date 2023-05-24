@@ -105,12 +105,11 @@ class Test {
     async testFlow() {
         console.log('testFlow');
         let users = accounts.getUsers()[1];
-        let porter = accounts.getPorters()[1];
         // Launch synchronizer
         await synchronizer.launch();
         for (let i in networkMgr.networks) {
             if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, porter);
+                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
             }
         }
         // Mint token to user 1

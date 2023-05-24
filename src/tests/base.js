@@ -68,7 +68,7 @@ module.exports = {
             console.log('Substrate waiting for in block');
             await utils.sleep(10);
         }
-        let address = utils.toSubstrateAddress(porter);
+        let address = keyring.addFromSeed(Buffer.from(porter.substr(2), 'hex')).address;
         await api.tx.balances.transfer(address, amount).signAndSend(alice);
         console.log('Substrate waiting for in block');
         await utils.sleep(10);

@@ -87,18 +87,21 @@ class Test {
 
     async testRestore() {
         console.log('testRestore');
+        let index = 1;
         for (let i in global.networkMgr.networks) {
             // Prepare for testing work restore
-            await this.beforeRestore(global.networkMgr.networks[i]);
+            await this.beforeRestore(global.networkMgr.networks[i], index);
 
             // Launch synchronizer
             await synchronizer.launch();
 
             // Test work restore
-            await this.afterRestore(global.networkMgr.networks[i]);
+            await this.afterRestore(global.networkMgr.networks[i], index);
 
             // Shut down synchronizer
             synchronizer.shutdown();
+
+            index++;
         }
     }
 
@@ -118,11 +121,9 @@ class Test {
         for (let i in global.networkMgr.networks) {
             console.log(i, global.networkMgr.networks[i].chainType);
             await base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
-            await utils.sleep(5);
+            await utils.sleep(10);
             await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
-            if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {   
-                await utils.sleep(30);
-            }
+            await utils.sleep(10);
             let ret = await base.balanceOf(global.networkMgr.networks[i].chainType, i, users[2]);
             console.log('ret', ret.toString());
             // assert(ret.includes((11 * index).toString()), 'Balance error');
@@ -134,12 +135,12 @@ class Test {
         console.log('runTests');
         synchronizer.prepare('ft');
 
-        // await this.testRestore();
+        await this.testRestore();
 
         await this.testFlow();
     }
 
-    async beforeRestore(network) {
+    async beforeRestore(network, index) {
         console.log('beforeRestore');
         let users = accounts.getUsers()[1];
         // Mint to user 0
@@ -148,16 +149,17 @@ class Test {
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())
-        assert(ret.includes('0'), 'Balance error');
+        assert(ret.includes((100 * (index - 1)).toString()), 'Balance error');
     }
 
-    async afterRestore(network) {
+    async afterRestore(network, index) {
         console.log('afterRestore');
+        await utils.sleep(10);
         let users = accounts.getUsers()[1];
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())
-        assert(ret.includes('100'), 'Balance error');
+        assert(ret.includes((100 * index).toString()), 'Balance error');
     }
 }
 

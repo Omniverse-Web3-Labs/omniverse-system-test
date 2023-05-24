@@ -17,6 +17,7 @@ class Database {
             item.nodeAddress = network.rpc;
             item.omniverseChainId = network.omniverseChainId;
             if (network.chainType == 'EVM') {
+                item.chainId = global.networkMgr.networks[i].chainId;
                 item.omniverseContractAddress = network.EVMContract;
             } else if (network.chainType == 'SUBSTRATE') {
                 item.tokenId = global.networkMgr.networks[i].tokenId;
@@ -41,6 +42,8 @@ class Database {
         this.updateDatabaseConfig(contractType);
 
         this.updateDatabaseRes(contractType);
+
+        execSync('cd ' + config.get('submodules.databasePath') + ' && rm omniverse.db');
     }
 
     launch(contractType) {

@@ -5,7 +5,7 @@ const utils = require('./utils/utils');
 
 class Synchronizer {
     constructor() {
-
+        this.instance;
     }
 
     updateConfig(contractType) {
@@ -18,14 +18,13 @@ class Synchronizer {
             if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.EVM")));
                 item.chainId = global.networkMgr.networks[i].chainId;
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.omniverseChainId = i;
             } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.SUBSTRATE")));
-                item.chainId = global.networkMgr.networks[i].chainId;
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.tokenId = global.networkMgr.networks[i].tokenId;
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.omniverseChainId = i;
                 if (contractType == 'ft') {
                     item.pallets = ['assets'];
@@ -65,15 +64,15 @@ class Synchronizer {
     }
 
     async launch() {
-        exec('cd ' + config.get('submodules.synchronizerPath') + ' && rm .state');
+        this.beforeLaunch();
 
-        exec('cd ' + config.get('submodules.synchronizerPath') + ' && node src/main.js > sync.log');
+        this.instance = exec('cd ' + config.get('submodules.synchronizerPath') + ' && node src/main.js > sync.log');
         await utils.sleep(5);
     }
 
     shutdown() {
         console.log('shutdown');
-        execSync("ps -ef | grep 'omniverse-synchronizer/src/main.js' | grep -v grep | awk '{print $2}' | xargs kill -9");
+        process.kill(this.instance.pid);
     }
 }
 

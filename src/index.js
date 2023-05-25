@@ -7,6 +7,7 @@ const accounts = require('./utils/accounts');
 const database = require('./database');
 const { program } = require('commander');
 const { execSync } = require("child_process");
+const synchronizer = require('./synchronizer');
 global.networkMgr = require('./utils/networkMgr');
 global.Childs = [];
 
@@ -55,9 +56,14 @@ async function deploy(contractType) {
     await contracts.deploy(contractType);
 
     ////////////////////////////////////////////////////////
-    //                  Launch Database                   //
+    //                  Prepare Database                  //
     ////////////////////////////////////////////////////////
-    database.launch(contractType);
+    database.prepare(contractType);
+
+    ////////////////////////////////////////////////////////
+    //                Prepare Synchronizer                //
+    ////////////////////////////////////////////////////////
+    synchronizer.prepare(contractType);
 
     ////////////////////////////////////////////////////////
     //                  Initialize Tests                  //
@@ -79,6 +85,11 @@ async function test(contractType) {
 
     // Deploy
     await deploy(contractType);
+
+    ////////////////////////////////////////////////////////
+    //                  Launch Database                   //
+    ////////////////////////////////////////////////////////
+    await database.launch(contractType);
 
     // Run test cases
     await tests.runTest();

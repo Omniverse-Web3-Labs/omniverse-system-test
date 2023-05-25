@@ -1,5 +1,7 @@
 const config = require('config');
-const { exec, execSync } = require("child_process");
+const { exec, spawn, execSync } = require("child_process");
+const utils = require('./utils/utils');
+const fs = require('fs');
 
 class Database {
     constructor() {
@@ -38,18 +40,27 @@ class Database {
         execSync('mkdir -p ' + config.get('submodules.databasePath') + 'res && cp ' + config.get('submodules.omniverseContractPath') + 'build/contracts/EVMContract.json ' + config.get('submodules.databasePath') + 'res/EVMContract.json');
     }
 
-    beforeLaunch(contractType) {
+    prepare(contractType) {
         this.updateDatabaseConfig(contractType);
 
         this.updateDatabaseRes(contractType);
-
-        execSync('cd ' + config.get('submodules.databasePath') + ' && rm omniverse.db');
     }
 
-    launch(contractType) {
-        this.beforeLaunch(contractType);
+    beforeLaunch() {
+        execSync('cd ' + config.get('submodules.databasePath') + ' && if [ -f "omniverse.db" ]; then rm omniverse.db; fi && if [ -f ".state" ]; then rm .state; fi');
+    }
 
-        exec('cd ' + config.get('submodules.databasePath') + ' && node src/main.js > out.log');
+    async launch() {
+        console.log('Launch database');
+        this.beforeLaunch();
+
+        var logStream = fs.createWriteStream(config.get('submodules.databasePath') + 'out.log', {flags: 'a'});
+        let ret = spawn('node', ['src/main.js'], {
+            cwd: config.get('submodules.databasePath')
+        });
+        ret.stdout.pipe(logStream);
+        ret.stderr.pipe(logStream);
+        await utils.sleep(5);
     }
 }
 

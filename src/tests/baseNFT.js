@@ -17,9 +17,9 @@ module.exports = {
             execSync(cmd);
             await utils.sleep(2);
         } else if (chainType == 'SUBSTRATE') {
-            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node nft.js -s 0';
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s 0';
             execSync(cmd);
-            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node nft.js -p uniques -m ' + chainName + ',' + to + ',' + token;
+            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -m ' + chainName + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(3);
         }
@@ -33,9 +33,9 @@ module.exports = {
             execSync(cmd);
             await utils.sleep(2);
         } else if (chainType == 'SUBSTRATE') {
-            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node nft.js -s ' + fromIndex;
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s ' + fromIndex;
             execSync(cmd);
-            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node nft.js -p uniques -t ' + chainName + ',' + to + ',' + token;
+            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -t ' + chainName + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(3);
         }
@@ -47,7 +47,7 @@ module.exports = {
             let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -ob ' + chainName + ',' + account;
             ret = execSync(cmd);
         } else if (chainType == 'SUBSTRATE') {
-            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node nft.js -p uniques -o ' + chainName + ',' + account;
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -o ' + chainName + ',' + account;
             ret = execSync(cmd);
         }
         return ret;
@@ -59,7 +59,7 @@ module.exports = {
             let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -oo ' + chainName + ',' + tokenId;
             ret = execSync(cmd);
         } else if (chainType == 'SUBSTRATE') {
-            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node nft.js -n ' + chainName + ',NFT,' + tokenId;
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -n ' + chainName + ',NFT,' + tokenId;
             ret = execSync(cmd);
         }
         return ret;

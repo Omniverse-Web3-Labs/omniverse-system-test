@@ -76,6 +76,7 @@ class SubstrateDeployer {
         }
       }
     }
+    await utils.sleep(12);
   }
 }
 

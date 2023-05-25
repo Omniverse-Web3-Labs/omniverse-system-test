@@ -39,6 +39,13 @@ class Test {
         }
 
         await SubstrateChain.setMembers('ft');
+        
+        let users = accounts.getUsers()[1];
+        for (let i in networkMgr.networks) {
+            if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
+            }
+        }
     }
 
     updateToolConfig() {
@@ -89,6 +96,7 @@ class Test {
         console.log('testRestore');
         let index = 1;
         for (let i in global.networkMgr.networks) {
+            console.log(global.networkMgr.networks[i].chainType, index);
             // Prepare for testing work restore
             await this.beforeRestore(global.networkMgr.networks[i], index);
 
@@ -110,30 +118,25 @@ class Test {
         let users = accounts.getUsers()[1];
         // Launch synchronizer
         await synchronizer.launch();
-        for (let i in networkMgr.networks) {
-            if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
-            }
-        }
+
         // Mint token to user 1
         console.log('Mint token');
         let index = 1;
         for (let i in global.networkMgr.networks) {
             console.log(i, global.networkMgr.networks[i].chainType);
             await base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
-            await utils.sleep(10);
+            await utils.sleep(20);
             await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
-            await utils.sleep(10);
+            await utils.sleep(20);
             let ret = await base.balanceOf(global.networkMgr.networks[i].chainType, i, users[2]);
             console.log('ret', ret.toString());
-            // assert(ret.includes((11 * index).toString()), 'Balance error');
+            assert(ret.includes((11 * index).toString()), 'Balance error');
             index++;
         }
     }
 
     async runTest() {
         console.log('runTests');
-        synchronizer.prepare('ft');
 
         await this.testRestore();
 
@@ -145,7 +148,7 @@ class Test {
         let users = accounts.getUsers()[1];
         // Mint to user 0
         base.mint(network.chainType, network.chainName, users[0], 100);
-        await utils.sleep(2);
+        await utils.sleep(5);
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())

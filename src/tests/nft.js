@@ -8,6 +8,18 @@ const base = require('./baseNFT');
 const synchronizer = require("../synchronizer");
 const SubstrateChain = require('../contracts/substrate')
 
+function checkOwner(value, chainType, pk, including) {
+    if (chainType == 'SUBSTRATE') {
+        let addr = utils.toSubstrateAddress(pk);
+        let ret = value.includes(addr);
+        assert(including ? ret : !ret, 'Balance error');
+    }
+    else {
+        let ret = value.includes(pk);
+        assert(including ? ret : !ret, 'Balance error');            
+    }
+}
+
 class Test {
     async initialize() {
         console.log('initialize', global.networkMgr.networks);
@@ -39,6 +51,13 @@ class Test {
         }
 
         await SubstrateChain.setMembers('nft');
+        
+        let users = accounts.getUsers()[1];
+        for (let i in networkMgr.networks) {
+            if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
+            }
+        }
     }
 
     updateToolConfig() {
@@ -110,30 +129,25 @@ class Test {
         let users = accounts.getUsers()[1];
         // Launch synchronizer
         await synchronizer.launch();
-        for (let i in networkMgr.networks) {
-            if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
-            }
-        }
+
         // Mint token to user 1
         console.log('Mint token');
         let index = 100;
         for (let i in global.networkMgr.networks) {
             console.log(i, global.networkMgr.networks[i].chainType);
             await base.mint(global.networkMgr.networks[i].chainType, i, users[1], index);
-            await utils.sleep(10);
+            await utils.sleep(20);
             await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], index);
-            await utils.sleep(10);
+            await utils.sleep(20);
             let ret = await base.ownerOf(global.networkMgr.networks[i].chainType, i, index);
             console.log('ret', ret.toString());
-            assert(ret.includes(users[2]), 'Balance error');
+            checkOwner(ret, global.networkMgr.networks[i].chainType, users[2], true);
             index++;
         }
     }
 
     async runTest() {
         console.log('runTests');
-        synchronizer.prepare('nft');
 
         // await this.testRestore();
 
@@ -149,7 +163,7 @@ class Test {
 
         let ret = await base.ownerOf(network.chainType, network.chainName, index);
         console.log('ret', ret.toString())
-        // assert(ret.includes('0'), 'Balance error');
+        checkOwner(ret, network.chainType, users[0], false);
     }
 
     async afterRestore(network, index) {
@@ -157,8 +171,8 @@ class Test {
         let users = accounts.getUsers()[1];
 
         let ret = await base.ownerOf(network.chainType, network.chainName, index);
-        console.log('ret', ret.toString())
-        assert(ret.includes(users[0]), 'Balance error');
+        console.log('ret', ret.toString());
+        checkOwner(ret, network.chainType, users[0], true);
     }
 }
 

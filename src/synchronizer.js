@@ -1,4 +1,4 @@
-const { exec, execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const accounts = require('./utils/accounts');
 const config = require('config');
 const utils = require('./utils/utils');
@@ -60,13 +60,18 @@ class Synchronizer {
     }
 
     beforeLaunch() {
-        exec('cd ' + config.get('submodules.synchronizerPath') + ' && rm .state');
+        execSync('cd ' + config.get('submodules.synchronizerPath') + ' && if [ -f ".state" ]; then rm .state; fi');
     }
 
     async launch() {
         this.beforeLaunch();
 
-        this.instance = exec('cd ' + config.get('submodules.synchronizerPath') + ' && node src/main.js > sync.log');
+        var logStream = fs.createWriteStream(config.get('submodules.synchronizerPath') + 'out.log', {flags: 'a'});
+        this.instance = spawn('node', ['src/main.js'], {
+            cwd: config.get('submodules.synchronizerPath')
+        });
+        this.instance.stdout.pipe(logStream);
+        this.instance.stderr.pipe(logStream);
         await utils.sleep(5);
     }
 

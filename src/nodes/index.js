@@ -1,6 +1,5 @@
 const EVMChain = require('./EVMChain');
 const SustrateChain = require('./substrate');
-const config = require('config');
 
 class NodesMgr {
     constructor() {

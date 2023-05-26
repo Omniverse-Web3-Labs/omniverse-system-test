@@ -141,7 +141,7 @@ class Test {
             await utils.sleep(20);
             let ret = await base.ownerOf(global.networkMgr.networks[i].chainType, i, index);
             console.log('ret', ret.toString());
-            checkOwner(ret, global.networkMgr.networks[i].chainType, users[2], true);
+            checkOwner(ret.toString(), global.networkMgr.networks[i].chainType, users[2], true);
             index++;
         }
     }
@@ -149,7 +149,7 @@ class Test {
     async runTest() {
         console.log('runTests');
 
-        // await this.testRestore();
+        await this.testRestore();
 
         await this.testFlow();
     }
@@ -159,20 +159,21 @@ class Test {
         let users = accounts.getUsers()[1];
         // Mint to user 0
         base.mint(network.chainType, network.chainName, users[0], index);
-        await utils.sleep(2);
+        await utils.sleep(5);
 
-        let ret = await base.ownerOf(network.chainType, network.chainName, index);
+        let ret = base.ownerOf(network.chainType, network.chainName, index);
         console.log('ret', ret.toString())
-        checkOwner(ret, network.chainType, users[0], false);
+        checkOwner(ret.toString(), network.chainType, users[0], false);
     }
 
     async afterRestore(network, index) {
         console.log('afterRestore');
+        await utils.sleep(20);
         let users = accounts.getUsers()[1];
 
         let ret = await base.ownerOf(network.chainType, network.chainName, index);
         console.log('ret', ret.toString());
-        checkOwner(ret, network.chainType, users[0], true);
+        checkOwner(ret.toString(), network.chainType, users[0], true);
     }
 }
 

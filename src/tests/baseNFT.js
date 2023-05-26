@@ -53,11 +53,16 @@ module.exports = {
         return ret;
     },
 
-    async ownerOf(chainType, chainName, tokenId) {
+    ownerOf(chainType, chainName, tokenId) {
         let ret;
         if (chainType == 'EVM') {
             let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -oo ' + chainName + ',' + tokenId;
-            ret = execSync(cmd);
+            try {
+                ret = execSync(cmd);
+            }
+            catch (e) {
+                ret = e;
+            }
         } else if (chainType == 'SUBSTRATE') {
             let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -n ' + chainName + ',NFT,' + tokenId;
             ret = execSync(cmd);

@@ -157,7 +157,7 @@ class Test {
 
     async afterRestore(network, index) {
         console.log('afterRestore');
-        await utils.sleep(10);
+        await utils.sleep(20);
         let users = accounts.getUsers()[1];
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);

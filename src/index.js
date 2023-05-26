@@ -116,9 +116,12 @@ async function test(contractType) {
     }
 }());
 
-// kill the child process
-process.on('exit', () => {
-    for (let child of Childs) {
-        process.kill(child.pid);
-    }
-});
+process.on('unhandledRejection', (err) => {
+    console.log('UnhanledRejection', err);
+    process.exit();
+})
+
+process.on('uncaughtException', (err) => {
+    console.log('UnhanledException', err);
+    process.exit();
+})

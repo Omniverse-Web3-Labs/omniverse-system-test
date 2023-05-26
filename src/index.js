@@ -118,10 +118,10 @@ async function test(contractType) {
 
 process.on('unhandledRejection', (err) => {
     console.log('UnhanledRejection', err);
-    process.exit();
+    process.kill(-process.pid);
 })
 
 process.on('uncaughtException', (err) => {
     console.log('UnhanledException', err);
-    process.exit();
+    process.kill(-process.pid);
 })

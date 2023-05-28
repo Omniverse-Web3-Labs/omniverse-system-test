@@ -27,7 +27,6 @@ class NodesMgr {
                 global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
                 global.networkMgr.networks[i].ws = 'http://127.0.0.1:' + this.port;
             }
-            global.networkMgr.networks[i].omniverseChainId = i;
             global.networkMgr.networks[i].port = this.port;
             this.nodesInfo[i] = this.port++;
         }

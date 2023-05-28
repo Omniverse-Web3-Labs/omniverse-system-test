@@ -11,19 +11,21 @@ class NetworkMgr {
         for (let i = 0; i < networks.length; ++i) {
             if (networks[i].count) {
                 for (let j = 0; j < networks[i].count; j++) {
-                    this.networks[index] = JSON.parse(JSON.stringify(networks[i]));
+                    let cfg = JSON.parse(JSON.stringify(networks[i]));
                     if (!networks[i].chainName) {
-                        this.networks[index].omniverseChainId = index;
-                        this.networks[index].chainName = 'CHAIN' + index++;
+                        cfg.omniverseChainId = index;
+                        cfg.chainName = 'CHAIN' + index++;
                     }
+                    this.networks[cfg.chainName] = cfg;
                 }
             }
             else {
-                this.networks[index] = JSON.parse(JSON.stringify(networks[i]));
+                let cfg = JSON.parse(JSON.stringify(networks[i]));
                 if (!networks[i].chainName) {
-                    this.networks[index].omniverseChainId = index;
-                    this.networks[index].chainName = 'CHAIN' + index++;
+                    cfg.omniverseChainId = index;
+                    cfg.chainName = 'CHAIN' + index++;
                 }
+                this.networks[cfg.chainName] = cfg;
             }
         }
         console.log('networkMgr', this.networks);

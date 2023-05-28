@@ -51,19 +51,20 @@ class SubstrateDeployer {
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))
     );
     for (let i in global.networkMgr.networks) {
-      if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
-        let provider = new WsProvider(networkMgr.networks[i].ws);
+      if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+        let provider = new WsProvider(global.networkMgr.networks[i].ws);
         let api = await ApiPromise.create({
           provider,
           noInitWarn: true,
         });
         let members = [];
-        for (let j in networkMgr.networks) {
+        for (let j in global.networkMgr.networks) {
+          let network = global.networkMgr.networks[j];
           if (j != i) {
-            if (networkMgr.networks[j].chainType == 'EVM') {
-              members.push([j, networkMgr.networks[j].EVMContract]);
-            } else if (networkMgr.networks[j].chainType == 'SUBSTRATE') {
-              members.push([j, networkMgr.networks[j].tokenId]);
+            if (network.chainType == 'EVM') {
+              members.push([network.omniverseChainId, network.EVMContract]);
+            } else if (network.chainType == 'SUBSTRATE') {
+              members.push([omniverseChainId, network.tokenId]);
             }
           }
         }

@@ -24,7 +24,7 @@ class EVMChainDeployer {
             item.nodeAddress = networks[i].rpc;
             item.chainId = 1337;
             item.coolingDown = networks[i].coolingDown;
-            item.omniverseChainId = i;
+            item.omniverseChainId = networks[i].omniverseChainId;
             cfg[networks[i].chainName] = item;
         }
         fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
@@ -35,7 +35,7 @@ class EVMChainDeployer {
         let str = '';
         let networks = global.networkMgr.getNetworksByType('EVM');
         for (let i in networks) {
-            str += networks[i].chainName + ': ' + i + ',\n';
+            str += networks[i].chainName + ': ' + networks[i].omniverseChainId + ',\n';
         }
         console.log('migrate networks', str);
         let migrationScript = fs.readFileSync('./res/2_deploy_contracts.js').toString();

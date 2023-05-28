@@ -105,7 +105,7 @@ async function test(contractType) {
         .version('0.1.0')
         .option('-i, --install', 'Install environment')
         .option('-t, --test <app name>', 'Test application')
-        .option('-d, --deploy', 'Deploy contracts')
+        .option('-d, --deploy <app name>', 'Deploy contracts')
         .parse(process.argv);
 
     if (program.opts().install) {

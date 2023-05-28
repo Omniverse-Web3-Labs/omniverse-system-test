@@ -2,11 +2,13 @@ const eccrypto = require('eccrypto');
 const config = require('config');
 const utils = require('./utils');
 const assert = require('assert');
+const fs = require('fs');
 
 class Accounts {
     constructor() {
         if (config.has('accounts')) {
-            this.sks = config.has('accounts');
+            let secret = JSON.parse(fs.readFileSync(config.get('accounts')));
+            this.sks = secret;
             assert(this.sks.length == 2, 'Accounts config error');
         }
         else {

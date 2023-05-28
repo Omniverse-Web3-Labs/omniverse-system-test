@@ -13,12 +13,13 @@ class Test {
         console.log('initialize', global.networkMgr.networks);
         let allienceInfo = '';
         for (let i in global.networkMgr.networks) {
+            let network = global.networkMgr.networks[i];
             let item = '';
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
-                item = '"' + i + '|' + global.networkMgr.networks[i].EVMContract + '"';
-            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                let tokenId = '0x' + Buffer.from(global.networkMgr.networks[i].tokenId).toString('hex');
-                item = '"' + i + '|' + tokenId + '"';
+            if (network.chainType == 'EVM') {
+                item = '"' + network.omniverseChainId + '|' + network.EVMContract + '"';
+            } else if (network.chainType == 'SUBSTRATE') {
+                let tokenId = '0x' + Buffer.from(network.tokenId).toString('hex');
+                item = '"' + network.omniverseChainId + '|' + tokenId + '"';
             }
             
             if (allienceInfo == '') {
@@ -32,8 +33,9 @@ class Test {
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
         for (let i in global.networkMgr.networks) {
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
-                cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + i + ',' + allienceInfo;
+            let network = global.networkMgr.networks[i];
+            if (network.chainType == 'EVM') {
+                cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + network.chainName + ',' + allienceInfo;
                 execSync(cmd);
             }
         }
@@ -54,11 +56,12 @@ class Test {
         let cfg = {};
         for (let i in global.networkMgr.networks) {
             let item = {};
-            if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
-                item.tokenId = global.networkMgr.networks[i].tokenId;
-                item.omniverseChainId = i;
-                cfg[i] = item;
+            let network = global.networkMgr.networks[i];
+            if (network.chainType == 'SUBSTRATE') {
+                item.nodeAddress = network.rpc;
+                item.tokenId = network.tokenId;
+                item.omniverseChainId = network.omniverseChainId;
+                cfg[network.chainName] = item;
             }
         }
         fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
@@ -124,12 +127,13 @@ class Test {
         console.log('Mint token');
         let index = 1;
         for (let i in global.networkMgr.networks) {
-            console.log(i, global.networkMgr.networks[i].chainType);
-            await base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
+            let network = global.networkMgr.networks[i];
+            console.log(i, network.chainType);
+            await base.mint(network.chainType, network.chainName, users[1], 100);
             await utils.sleep(10);
-            await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
+            await base.transfer(network.chainType, network.chainName, 3, users[2], 11);
             await utils.sleep(10);
-            let ret = await base.balanceOf(global.networkMgr.networks[i].chainType, i, users[2]);
+            let ret = await base.balanceOf(network.chainType, network.chainName, users[2]);
             console.log('ret', ret.toString());
             assert(ret.includes((11 * index).toString()), 'Balance error');
             index++;

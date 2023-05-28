@@ -25,12 +25,13 @@ class Test {
         console.log('initialize', global.networkMgr.networks);
         let allienceInfo = '';
         for (let i in global.networkMgr.networks) {
+            let network = global.networkMgr.networks[i];
             let item = '';
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
-                item = '"' + i + '|' + global.networkMgr.networks[i].EVMContract + '"';
-            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                let tokenId = '0x' + Buffer.from(global.networkMgr.networks[i].tokenId).toString('hex');
-                item = '"' + i + '|' + tokenId + '"';
+            if (network.chainType == 'EVM') {
+                item = '"' + network.omniverseChainId + '|' + network.EVMContract + '"';
+            } else if (network.chainType == 'SUBSTRATE') {
+                let tokenId = '0x' + Buffer.from(network.tokenId).toString('hex');
+                item = '"' + network.omniverseChainId + '|' + tokenId + '"';
             }
             
             if (allienceInfo == '') {
@@ -44,8 +45,9 @@ class Test {
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
         for (let i in global.networkMgr.networks) {
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
-                cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/nft.js -i ' + i + ',http://,' + allienceInfo;
+            let network = global.networkMgr.networks[i];
+            if (network.chainType == 'EVM') {
+                cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/nft.js -i ' + network.chainName + ',http://,' + allienceInfo;
                 execSync(cmd);
             }
         }
@@ -64,12 +66,13 @@ class Test {
         console.log('updateToolConfig');
         let cfg = {};
         for (let i in global.networkMgr.networks) {
+            let network = global.networkMgr.networks[i];
             let item = {};
-            if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
-                item.tokenId = global.networkMgr.networks[i].tokenId;
-                item.omniverseChainId = i;
-                cfg[i] = item;
+            if (network.chainType == 'SUBSTRATE') {
+                item.nodeAddress = network.rpc;
+                item.tokenId = network.tokenId;
+                item.omniverseChainId = network.omniverseChainId;
+                cfg[network.chainName] = item;
             }
         }
         fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
@@ -116,7 +119,7 @@ class Test {
 
             // Test work restore
             await this.afterRestore(global.networkMgr.networks[i], index);
-
+            console.log('111 3')
             // Shut down synchronizer
             synchronizer.shutdown();
 
@@ -134,14 +137,15 @@ class Test {
         console.log('Mint token');
         let index = 100;
         for (let i in global.networkMgr.networks) {
-            console.log(i, global.networkMgr.networks[i].chainType);
-            await base.mint(global.networkMgr.networks[i].chainType, i, users[1], index);
+            let network = global.networkMgr.networks[i];
+            console.log(i, network.chainType);
+            await base.mint(network.chainType, network.chainName, users[1], index);
             await utils.sleep(20);
-            await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], index);
+            await base.transfer(network.chainType, network.chainName, 3, users[2], index);
             await utils.sleep(20);
-            let ret = await base.ownerOf(global.networkMgr.networks[i].chainType, i, index);
+            let ret = await base.ownerOf(network.chainType, network.chainName, index);
             console.log('ret', ret.toString());
-            checkOwner(ret.toString(), global.networkMgr.networks[i].chainType, users[2], true);
+            checkOwner(ret.toString(), network.chainType, users[2], true);
             index++;
         }
     }
@@ -158,7 +162,7 @@ class Test {
         console.log('beforeRestore');
         let users = accounts.getUsers()[1];
         // Mint to user 0
-        base.mint(network.chainType, network.chainName, users[0], index);
+        await base.mint(network.chainType, network.chainName, users[0], index);
         await utils.sleep(5);
 
         let ret = base.ownerOf(network.chainType, network.chainName, index);

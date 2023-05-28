@@ -14,25 +14,26 @@ class Synchronizer {
         cfg.networks = {};
         
         for (let i in global.networkMgr.networks) {
+            let network = global.networkMgr.networks[i];
             let item = {};
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
+            if (network.chainType == 'EVM') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.EVM")));
-                item.chainId = global.networkMgr.networks[i].chainId;
-                item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
-                item.nodeAddress = global.networkMgr.networks[i].ws;
-                item.omniverseChainId = i;
-            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                item.chainId = network.chainId;
+                item.omniverseContractAddress = network.EVMContract;
+                item.nodeAddress = network.ws;
+                item.omniverseChainId = network.omniverseChainId;
+            } else if (network.chainType == 'SUBSTRATE') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.SUBSTRATE")));
-                item.tokenId = global.networkMgr.networks[i].tokenId;
-                item.nodeAddress = global.networkMgr.networks[i].ws;
-                item.omniverseChainId = i;
+                item.tokenId = network.tokenId;
+                item.nodeAddress = network.ws;
+                item.omniverseChainId = network.omniverseChainId;
                 if (contractType == 'ft') {
                     item.pallets = ['assets'];
                 } else {
                     item.pallets = ['uniques'];
                 }
             }
-            cfg.networks[i] = item;
+            cfg.networks[network.chainName] = item;
         }
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }
@@ -46,7 +47,7 @@ class Synchronizer {
         console.log('Synchronizer updateSecret');
         let secretCfg = {};
         for (let i in global.networkMgr.networks) {
-            secretCfg[i] = accounts.getPorters()[0];
+            secretCfg[global.networkMgr.networks[i].chainName] = accounts.getPorters()[0];
         }
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/.secret', JSON.stringify(secretCfg, null, '\t'));
     }

@@ -13,17 +13,20 @@ class NetworkMgr {
                 for (let j = 0; j < networks[i].count; j++) {
                     this.networks[index] = JSON.parse(JSON.stringify(networks[i]));
                     if (!networks[i].chainName) {
-                        this.networks[index].chainName = index++;
+                        this.networks[index].omniverseChainId = index;
+                        this.networks[index].chainName = 'CHAIN' + index++;
                     }
                 }
             }
             else {
                 this.networks[index] = JSON.parse(JSON.stringify(networks[i]));
                 if (!networks[i].chainName) {
-                    this.networks[index].chainName = index++;
+                    this.networks[index].omniverseChainId = index;
+                    this.networks[index].chainName = 'CHAIN' + index++;
                 }
             }
         }
+        console.log('networkMgr', this.networks);
     }
 
     getNetworksByType(chainType) {

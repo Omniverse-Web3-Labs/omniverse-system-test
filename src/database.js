@@ -30,7 +30,7 @@ class Database {
                 }
                 console.log(item);
             }
-            cfg.networks[i] = item;
+            cfg.networks[network.chainName] = item;
         }
         fs.writeFileSync(config.get('submodules.databasePath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }

@@ -25,7 +25,7 @@ class EVMChainDeployer {
             item.chainId = 1337;
             item.coolingDown = networks[i].coolingDown;
             item.omniverseChainId = i;
-            cfg[i] = item;
+            cfg[networks[i].chainName] = item;
         }
         fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }
@@ -35,7 +35,7 @@ class EVMChainDeployer {
         let str = '';
         let networks = global.networkMgr.getNetworksByType('EVM');
         for (let i in networks) {
-            str += i + ': ' + i + ',\n';
+            str += networks[i].chainName + ': ' + i + ',\n';
         }
         console.log('migrate networks', str);
         let migrationScript = fs.readFileSync('./res/2_deploy_contracts.js').toString();
@@ -49,7 +49,7 @@ class EVMChainDeployer {
         let netConfig = 'CHAIN_NAME:{\nprovider:()=>new HDWalletProvider(mnemonic, `CHAIN_RPC`),\nnetwork_id:"*"\n},\n';
         let networks = global.networkMgr.getNetworksByType('EVM');
         for (let i in networks) {
-            str += netConfig.replace('CHAIN_NAME', i).
+            str += netConfig.replace('CHAIN_NAME', networks[i].chainName).
             replace('CHAIN_RPC', networks[i].rpc);
         }
         console.log('truffle networks', str);
@@ -63,7 +63,7 @@ class EVMChainDeployer {
         execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[0].slice(2) + " > .secret");
 
         let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName;
-        execSync(cmd);
+        execSync(cmd).toString();
     }
 }
 

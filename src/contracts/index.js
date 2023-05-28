@@ -15,12 +15,13 @@ class ContractsMgr {
     async afterDeploy(contractType) {
         let omniverseCfg = JSON.parse(fs.readFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json').toString());
         for (let i in global.networkMgr.networks) {
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
+            let network = global.networkMgr.networks[i];
+            if (network.chainType == 'EVM') {
                 if (contractType == 'ft') {
-                    global.networkMgr.networks[i].EVMContract = omniverseCfg[i].skywalkerFungibleAddress;
+                    network.EVMContract = omniverseCfg[network.chainName].skywalkerFungibleAddress;
                 }
                 else {
-                    global.networkMgr.networks[i].EVMContract = omniverseCfg[i].skywalkerNonFungibleAddress;
+                    network.EVMContract = omniverseCfg[network.chainName].skywalkerNonFungibleAddress;
                 }
             }
         }

@@ -54,7 +54,7 @@ module.exports = {
     },
 
     async transferSubstrateNativeToken(network, users, porter) {
-        let provider = new WsProvider(network.rpc);
+        let provider = new WsProvider(network.ws);
         let api = await ApiPromise.create({
             provider,
             noInitWarn: true,

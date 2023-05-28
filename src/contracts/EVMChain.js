@@ -22,7 +22,7 @@ class EVMChainDeployer {
         for (let i in networks) {
             let item = {};
             item.nodeAddress = networks[i].rpc;
-            item.chainId = 1337;
+            item.chainId = networks[i].chainId;
             item.coolingDown = networks[i].coolingDown;
             item.omniverseChainId = networks[i].omniverseChainId;
             cfg[networks[i].chainName] = item;
@@ -63,7 +63,16 @@ class EVMChainDeployer {
         execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[0].slice(2) + " > .secret");
 
         let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName + " --skip-dry-run";
-        execSync(cmd).toString();
+        while (true) {
+            try {
+                console.log('Execute deployment');
+                execSync(cmd).toString();
+            }
+            catch (e) {
+                continue;
+            }
+            break;
+        }
     }
 }
 

@@ -14,6 +14,7 @@ class NetworkMgr {
                     let cfg = JSON.parse(JSON.stringify(networks[i]));
                     if (!networks[i].chainName) {
                         cfg.omniverseChainId = index;
+                        cfg.chainId = 1337;
                         cfg.chainName = 'CHAIN' + index++;
                     }
                     this.networks[cfg.chainName] = cfg;

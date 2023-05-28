@@ -115,7 +115,7 @@ async function test(contractType) {
         await test(program.opts().test);
     }
     else if (program.opts().deploy) {
-        await deploy(program.opts().test);
+        await deploy(program.opts().deploy);
     }
 }());
 

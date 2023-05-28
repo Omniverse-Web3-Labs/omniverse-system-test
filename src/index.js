@@ -72,6 +72,8 @@ async function deploy(contractType) {
     //                  Initialize Tests                  //
     ////////////////////////////////////////////////////////
     await tests.prepare();
+
+    console.log('Deploy completed');
 }
 
 async function test(contractType) {

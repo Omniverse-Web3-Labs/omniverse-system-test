@@ -62,7 +62,7 @@ class EVMChainDeployer {
         console.log('deployOmniverse', chainInfo);
         execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[0].slice(2) + " > .secret");
 
-        let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName;
+        let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName + " --skip-dry-run";
         execSync(cmd).toString();
     }
 }

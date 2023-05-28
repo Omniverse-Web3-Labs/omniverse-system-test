@@ -16,7 +16,7 @@ class Database {
         for (let i in global.networkMgr.networks) {
             let network = global.networkMgr.networks[i];
             let item = JSON.parse(JSON.stringify(config.get(`database.networkTemp.${network.chainType}`)));
-            item.nodeAddress = network.rpc;
+            item.nodeAddress = network.ws;
             item.omniverseChainId = network.omniverseChainId;
             if (network.chainType == 'EVM') {
                 item.chainId = global.networkMgr.networks[i].chainId;

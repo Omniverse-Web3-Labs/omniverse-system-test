@@ -13,7 +13,7 @@ class SubstrateDeployer {
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))
     );
     let amount = BigInt('20000000000000000');
-    let provider = new WsProvider(chainInfo.rpc);
+    let provider = new WsProvider(chainInfo.ws);
     let api = await ApiPromise.create({
       provider,
       noInitWarn: true,
@@ -52,7 +52,7 @@ class SubstrateDeployer {
     );
     for (let i in global.networkMgr.networks) {
       if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
-        let provider = new WsProvider(networkMgr.networks[i].rpc);
+        let provider = new WsProvider(networkMgr.networks[i].ws);
         let api = await ApiPromise.create({
           provider,
           noInitWarn: true,

@@ -19,12 +19,12 @@ class Synchronizer {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.EVM")));
                 item.chainId = global.networkMgr.networks[i].chainId;
                 item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.nodeAddress = global.networkMgr.networks[i].ws;
                 item.omniverseChainId = i;
             } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.SUBSTRATE")));
                 item.tokenId = global.networkMgr.networks[i].tokenId;
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.nodeAddress = global.networkMgr.networks[i].ws;
                 item.omniverseChainId = i;
                 if (contractType == 'ft') {
                     item.pallets = ['assets'];

@@ -12,12 +12,16 @@ class NetworkMgr {
             if (networks[i].count) {
                 for (let j = 0; j < networks[i].count; j++) {
                     this.networks[index] = JSON.parse(JSON.stringify(networks[i]));
-                    this.networks[index].chainName = index++;
+                    if (!networks[i].chainName) {
+                        this.networks[index].chainName = index++;
+                    }
                 }
             }
             else {
                 this.networks[index] = JSON.parse(JSON.stringify(networks[i]));
-                this.networks[index].chainName = index++;
+                if (!networks[i].chainName) {
+                    this.networks[index].chainName = index++;
+                }
             }
         }
     }

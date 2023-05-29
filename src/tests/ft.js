@@ -6,15 +6,19 @@ const accounts = require('../utils/accounts');
 const assert = require('assert');
 const base = require('./base');
 const synchronizer = require("../synchronizer");
+const SubstrateChain = require('../contracts/substrate')
 
 class Test {
-    initialize() {
+    async initialize() {
         console.log('initialize', global.networkMgr.networks);
         let allienceInfo = '';
         for (let i in global.networkMgr.networks) {
-            let item;
+            let item = '';
             if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = '"' + i + '|' + global.networkMgr.networks[i].EVMContract + '"';
+            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                let tokenId = '0x' + Buffer.from(global.networkMgr.networks[i].tokenId).toString('hex');
+                item = '"' + i + '|' + tokenId + '"';
             }
             
             if (allienceInfo == '') {
@@ -28,13 +32,36 @@ class Test {
         // Omniverse contracts
         console.log('allienceInfo', allienceInfo);
         for (let i in global.networkMgr.networks) {
-            cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + i + ',' + allienceInfo;
-            execSync(cmd);
+            if (global.networkMgr.networks[i].chainType == 'EVM') {
+                cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + i + ',' + allienceInfo;
+                execSync(cmd);
+            }
+        }
+
+        await SubstrateChain.setMembers('ft');
+        
+        let users = accounts.getUsers()[1];
+        console.log('Waiting for transfering substrate native token')
+        for (let i in networkMgr.networks) {
+            if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                await base.transferSubstrateNativeToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
+            }
         }
     }
 
     updateToolConfig() {
-        // console.log('updateToolConfig');
+        console.log('updateToolConfig');
+        let cfg = {};
+        for (let i in global.networkMgr.networks) {
+            let item = {};
+            if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.tokenId = global.networkMgr.networks[i].tokenId;
+                item.omniverseChainId = i;
+                cfg[i] = item;
+            }
+        }
+        fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }
     
     updateToolSecret() {
@@ -45,6 +72,7 @@ class Test {
         secretCfg.index = 0;
         secretCfg.mpc = secretCfg.sks[0];
         fs.writeFileSync(config.get('submodules.omniverseToolPath') + 'register/.secret', JSON.stringify(secretCfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + '.secret', JSON.stringify(secretCfg, null, '\t'));
     }
     
     updateToolRes() {
@@ -54,7 +82,7 @@ class Test {
         // execSync('cd ' + config.get('') + ' && echo -n ' + '' + ' > .secret');
     }
 
-    prepare() {
+    async prepare() {
         console.log('Test prepare');
         this.updateToolConfig();
 
@@ -62,23 +90,27 @@ class Test {
 
         this.updateToolRes();
 
-        this.initialize();
+        await this.initialize();
     }
 
     async testRestore() {
         console.log('testRestore');
+        let index = 1;
         for (let i in global.networkMgr.networks) {
+            console.log(global.networkMgr.networks[i].chainType, index);
             // Prepare for testing work restore
-            await this.beforeRestore(global.networkMgr.networks[i]);
+            await this.beforeRestore(global.networkMgr.networks[i], index);
 
             // Launch synchronizer
             await synchronizer.launch();
 
             // Test work restore
-            await this.afterRestore(global.networkMgr.networks[i]);
+            await this.afterRestore(global.networkMgr.networks[i], index);
 
             // Shut down synchronizer
             synchronizer.shutdown();
+
+            index++;
         }
     }
 
@@ -87,14 +119,16 @@ class Test {
         let users = accounts.getUsers()[1];
         // Launch synchronizer
         await synchronizer.launch();
+
         // Mint token to user 1
         console.log('Mint token');
         let index = 1;
         for (let i in global.networkMgr.networks) {
-            base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
-            await utils.sleep(2);
-            base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
-            await utils.sleep(2);
+            console.log(i, global.networkMgr.networks[i].chainType);
+            await base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
+            await utils.sleep(10);
+            await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
+            await utils.sleep(10);
             let ret = await base.balanceOf(global.networkMgr.networks[i].chainType, i, users[2]);
             console.log('ret', ret.toString());
             assert(ret.includes((11 * index).toString()), 'Balance error');
@@ -104,32 +138,31 @@ class Test {
 
     async runTest() {
         console.log('runTests');
-        synchronizer.prepare();
 
-        // await this.testRestore();
+        await this.testRestore();
 
         await this.testFlow();
     }
 
-    async beforeRestore(network) {
+    async beforeRestore(network, index) {
         console.log('beforeRestore');
         let users = accounts.getUsers()[1];
         // Mint to user 0
-        base.mint(network.chainType, network.chainName, users[0], 100);
-        await utils.sleep(2);
+        await base.mint(network.chainType, network.chainName, users[0], 100);
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())
-        assert(ret.includes('0'), 'Balance error');
+        assert(ret.includes((100 * (index - 1)).toString()), 'Balance error');
     }
 
-    async afterRestore(network) {
+    async afterRestore(network, index) {
         console.log('afterRestore');
+        await utils.sleep(5);
         let users = accounts.getUsers()[1];
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())
-        assert(ret.includes('100'), 'Balance error');
+        assert(ret.includes((100 * index).toString()), 'Balance error');
     }
 }
 

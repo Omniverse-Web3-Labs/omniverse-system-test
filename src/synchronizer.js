@@ -1,14 +1,14 @@
-const { exec, execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const accounts = require('./utils/accounts');
 const config = require('config');
 const utils = require('./utils/utils');
 
 class Synchronizer {
     constructor() {
-
+        this.instance;
     }
 
-    updateConfig() {
+    updateConfig(contractType) {
         console.log('Synchronizer updateConfig');
         let cfg = JSON.parse(JSON.stringify(config.get("synchronizer")));
         cfg.networks = {};
@@ -17,9 +17,20 @@ class Synchronizer {
             let item = {};
             if (global.networkMgr.networks[i].chainType == 'EVM') {
                 item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.EVM")));
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.chainId = global.networkMgr.networks[i].chainId;
                 item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
                 item.omniverseChainId = i;
+            } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.SUBSTRATE")));
+                item.tokenId = global.networkMgr.networks[i].tokenId;
+                item.nodeAddress = global.networkMgr.networks[i].rpc;
+                item.omniverseChainId = i;
+                if (contractType == 'ft') {
+                    item.pallets = ['assets'];
+                } else {
+                    item.pallets = ['uniques'];
+                }
             }
             cfg.networks[i] = item;
         }
@@ -40,8 +51,8 @@ class Synchronizer {
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/.secret', JSON.stringify(secretCfg, null, '\t'));
     }
 
-    prepare() {
-        this.updateConfig();
+    prepare(contractType) {
+        this.updateConfig(contractType);
 
         this.updateRes();
 
@@ -49,19 +60,24 @@ class Synchronizer {
     }
 
     beforeLaunch() {
-        exec('cd ' + config.get('submodules.synchronizerPath') + ' && rm .state');
+        execSync('cd ' + config.get('submodules.synchronizerPath') + ' && if [ -f ".state" ]; then rm .state; fi');
     }
 
     async launch() {
-        exec('cd ' + config.get('submodules.synchronizerPath') + ' && rm .state');
+        this.beforeLaunch();
 
-        exec('cd ' + config.get('submodules.synchronizerPath') + ' && node ' + config.get('submodules.synchronizerPath') + 'src/main.js > sync.log');
+        var logStream = fs.createWriteStream(config.get('submodules.synchronizerPath') + 'out.log', {flags: 'a'});
+        this.instance = spawn('node', ['src/main.js'], {
+            cwd: config.get('submodules.synchronizerPath')
+        });
+        this.instance.stdout.pipe(logStream);
+        this.instance.stderr.pipe(logStream);
         await utils.sleep(5);
     }
 
     shutdown() {
         console.log('shutdown');
-        execSync("ps -ef | grep 'omniverse-synchronizer/src/main.js' | grep -v grep | awk '{print $2}' | xargs kill -9");
+        this.instance.kill();
     }
 }
 

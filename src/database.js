@@ -1,23 +1,34 @@
 const config = require('config');
-const { exec, execSync } = require("child_process");
+const { exec, spawn, execSync } = require("child_process");
+const utils = require('./utils/utils');
+const fs = require('fs');
 
 class Database {
     constructor() {
 
     }
 
-    updateDatabaseConfig() {
+    updateDatabaseConfig(contractType) {
         console.log('updateDatabaseConfig');
         let cfg = JSON.parse(JSON.stringify(config.get("database")));
         cfg.networks = {};
     
         for (let i in global.networkMgr.networks) {
-            let item;
-            if (global.networkMgr.networks[i].chainType == 'EVM') {
-                item = JSON.parse(JSON.stringify(config.get("database.networkTemp.EVM")));
-                item.nodeAddress = global.networkMgr.networks[i].rpc;
-                item.omniverseContractAddress = global.networkMgr.networks[i].EVMContract;
-                item.omniverseChainId = global.networkMgr.networks[i].id;
+            let network = global.networkMgr.networks[i];
+            let item = JSON.parse(JSON.stringify(config.get(`database.networkTemp.${network.chainType}`)));
+            item.nodeAddress = network.rpc;
+            item.omniverseChainId = network.omniverseChainId;
+            if (network.chainType == 'EVM') {
+                item.chainId = global.networkMgr.networks[i].chainId;
+                item.omniverseContractAddress = network.EVMContract;
+            } else if (network.chainType == 'SUBSTRATE') {
+                item.tokenId = global.networkMgr.networks[i].tokenId;
+                if (contractType == 'ft') {
+                    item.pallets = ['assets'];
+                } else {
+                    item.pallets = ['uniques'];
+                }
+                console.log(item);
             }
             cfg.networks[i] = item;
         }
@@ -29,16 +40,27 @@ class Database {
         execSync('mkdir -p ' + config.get('submodules.databasePath') + 'res && cp ' + config.get('submodules.omniverseContractPath') + 'build/contracts/EVMContract.json ' + config.get('submodules.databasePath') + 'res/EVMContract.json');
     }
 
-    beforeLaunch(contractType) {
+    prepare(contractType) {
         this.updateDatabaseConfig(contractType);
 
         this.updateDatabaseRes(contractType);
     }
 
-    launch(contractType) {
-        this.beforeLaunch(contractType);
+    beforeLaunch() {
+        execSync('cd ' + config.get('submodules.databasePath') + ' && if [ -f "omniverse.db" ]; then rm omniverse.db; fi && if [ -f ".state" ]; then rm .state; fi');
+    }
 
-        exec('cd ' + config.get('submodules.databasePath') + ' && node src/main.js > out.log');
+    async launch() {
+        console.log('Launch database');
+        this.beforeLaunch();
+
+        var logStream = fs.createWriteStream(config.get('submodules.databasePath') + 'out.log', {flags: 'a'});
+        let ret = spawn('node', ['src/main.js'], {
+            cwd: config.get('submodules.databasePath')
+        });
+        ret.stdout.pipe(logStream);
+        ret.stderr.pipe(logStream);
+        await utils.sleep(5);
     }
 }
 

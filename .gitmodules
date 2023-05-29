@@ -1,9 +1,12 @@
 [submodule "submodules/omniverse-synchronizer"]
 	path = submodules/omniverse-synchronizer
-	url = git@virgil.github.com:Omniverse-Web3-Labs/omniverse-synchronizer.git
+	url = https://github.com/Omniverse-Web3-Labs/omniverse-synchronizer.git
 [submodule "submodules/omniverse-evm"]
 	path = submodules/omniverse-evm
-	url = git@virgil.github.com:Omniverse-Web3-Labs/omniverse-evm
+	url = https://github.com/Omniverse-Web3-Labs/omniverse-evm.git
 [submodule "submodules/omniverse-database"]
 	path = submodules/omniverse-database
-	url = git@virgil.github.com:Omniverse-Web3-Labs/omniverse-database
+	url = https://github.com/Omniverse-Web3-Labs/omniverse-database.git
+[submodule "submodules/omniverse-swap-tools"]
+	path = submodules/omniverse-swap-tools
+	url = https://github.com/Omniverse-Web3-Labs/omniverse-swap-tools.git

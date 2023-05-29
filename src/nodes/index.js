@@ -1,5 +1,5 @@
 const EVMChain = require('./EVMChain');
-const config = require('config');
+const SustrateChain = require('./substrate');
 
 class NodesMgr {
     constructor() {
@@ -16,8 +16,16 @@ class NodesMgr {
      */
     launch() {
         for (let i in global.networkMgr.networks) {
+            if (global.networkMgr.networks[i].rpc) {
+                continue;
+            }
             this.launchChain(global.networkMgr.networks[i]);
-            global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
+            if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
+            } else {
+                global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
+            }
+            global.networkMgr.networks[i].omniverseChainId = i;
             global.networkMgr.networks[i].port = this.port;
             this.nodesInfo[i] = this.port++;
         }
@@ -31,8 +39,11 @@ class NodesMgr {
     launchChain(chainInfo) {
         console.log('launchChain', chainInfo);
         if (chainInfo.chainType == 'EVM') {
-            EVMChain.launch(this.port, chainInfo);
+            Childs.push(EVMChain.launch(this.port, chainInfo));
+        } else if (chainInfo.chainType == 'SUBSTRATE') {
+            Childs.push(SustrateChain.launch(this.port, chainInfo));
         }
+        
     }
 
     getNodePort(chainName) {

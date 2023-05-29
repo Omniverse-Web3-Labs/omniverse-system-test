@@ -77,7 +77,7 @@ class Synchronizer {
 
     shutdown() {
         console.log('shutdown');
-        process.kill(this.instance.pid);
+        this.instance.kill();
     }
 }
 

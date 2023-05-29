@@ -21,25 +21,25 @@ class SubstrateDeployer {
     {
       let keyring = new Keyring({ type: 'sr25519' });
       let alice = keyring.addFromUri('//Alice');
-      await api.tx.balances
-        .transfer(owner.address, amount)
-        .signAndSend(alice, async ({ status, events }) => {
-          // console.log(status.isInBlock, status.isFinalized);
-          if (status.isInBlock) {
-            if (contractType == 'ft') {
-              await api.tx.assets
-                .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
-                .signAndSend(owner);
-            } else {
-              await api.tx.uniques
-                .createToken(accounts.getOwner()[1], chainInfo.tokenId, null)
-                .signAndSend(owner);
-            }
-          }
-        });
+      await utils.enqueueTask(Queues, api, 'balances', 'transfer', alice, [
+        owner.address,
+        amount,
+      ]);
+      if (contractType == 'ft') {
+        await utils.enqueueTask(Queues, api, 'assets', 'createToken', alice, [
+          accounts.getOwner()[1],
+          chainInfo.tokenId,
+          null
+        ]);
+      } else {
+        await utils.enqueueTask(Queues, api, 'uniques', 'createToken', alice, [
+          accounts.getOwner()[1],
+          chainInfo.tokenId,
+          null
+        ]);
+      }
     }
     console.log('Substrate waiting for in block');
-    await utils.sleep(10);
   }
 
   async setMembers(contractType) {
@@ -66,17 +66,18 @@ class SubstrateDeployer {
           }
         }
         if (contractType == 'ft') {
-          await api.tx.assets
-            .setMembers(networkMgr.networks[i].tokenId, members)
-            .signAndSend(owner);
+          await utils.enqueueTask(Queues, api, 'assets', 'setMembers', owner, [
+            networkMgr.networks[i].tokenId,
+            members
+          ]);
         } else {
-          await api.tx.uniques
-            .setMembers(networkMgr.networks[i].tokenId, members)
-            .signAndSend(owner);
+          await utils.enqueueTask(Queues, api, 'uniques', 'setMembers', owner, [
+            networkMgr.networks[i].tokenId,
+            members
+          ]);
         }
       }
     }
-    await utils.sleep(12);
   }
 }
 

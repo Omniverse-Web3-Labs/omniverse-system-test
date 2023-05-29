@@ -8,8 +8,11 @@ const database = require('./database');
 const { program } = require('commander');
 const { execSync } = require("child_process");
 const synchronizer = require('./synchronizer');
+const { queue } = require('async');
+const { substrateTxWorker } = require('./utils/utils');
 global.networkMgr = require('./utils/networkMgr');
 global.Childs = [];
+global.Queues = queue(substrateTxWorker, 1);
 
 function install() {
     console.log('install');

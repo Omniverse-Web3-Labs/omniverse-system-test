@@ -41,9 +41,10 @@ class Test {
         await SubstrateChain.setMembers('ft');
         
         let users = accounts.getUsers()[1];
+        console.log('Waiting for transfering substrate native token')
         for (let i in networkMgr.networks) {
             if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
-                await base.transferSubstrateOriginToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
+                await base.transferSubstrateNativeToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
             }
         }
     }
@@ -125,9 +126,9 @@ class Test {
         for (let i in global.networkMgr.networks) {
             console.log(i, global.networkMgr.networks[i].chainType);
             await base.mint(global.networkMgr.networks[i].chainType, i, users[1], 100);
-            await utils.sleep(20);
+            await utils.sleep(10);
             await base.transfer(global.networkMgr.networks[i].chainType, i, 3, users[2], 11);
-            await utils.sleep(20);
+            await utils.sleep(10);
             let ret = await base.balanceOf(global.networkMgr.networks[i].chainType, i, users[2]);
             console.log('ret', ret.toString());
             assert(ret.includes((11 * index).toString()), 'Balance error');
@@ -147,8 +148,7 @@ class Test {
         console.log('beforeRestore');
         let users = accounts.getUsers()[1];
         // Mint to user 0
-        base.mint(network.chainType, network.chainName, users[0], 100);
-        await utils.sleep(5);
+        await base.mint(network.chainType, network.chainName, users[0], 100);
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);
         console.log('ret', ret.toString())
@@ -157,7 +157,7 @@ class Test {
 
     async afterRestore(network, index) {
         console.log('afterRestore');
-        await utils.sleep(20);
+        await utils.sleep(5);
         let users = accounts.getUsers()[1];
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);

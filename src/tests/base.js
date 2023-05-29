@@ -53,7 +53,7 @@ module.exports = {
         return ret;
     },
 
-    async transferSubstrateOriginToken(network, users, porter) {
+    async transferSubstrateNativeToken(network, users, porter) {
         let provider = new WsProvider(network.rpc);
         let api = await ApiPromise.create({
             provider,
@@ -64,13 +64,23 @@ module.exports = {
         let alice = keyring.addFromUri('//Alice');
         for (let user of users) {
             let address = utils.toSubstrateAddress(user);
-            await api.tx.balances.transfer(address, amount).signAndSend(alice);
-            console.log('Substrate waiting for in block');
-            await utils.sleep(10);
+            await utils.enqueueTask(
+              Queues,
+              api,
+              'balances',
+              'transfer',
+              alice,
+              [address, amount]
+            );
         }
         let address = keyring.addFromSeed(Buffer.from(porter.substr(2), 'hex')).address;
-        await api.tx.balances.transfer(address, amount).signAndSend(alice);
-        console.log('Substrate waiting for in block');
-        await utils.sleep(10);
+        await utils.enqueueTask(
+            Queues,
+            api,
+            'balances',
+            'transfer',
+            alice,
+            [address, amount]
+          );
     }
 }

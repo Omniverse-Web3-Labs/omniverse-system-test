@@ -29,13 +29,15 @@ class SubstrateDeployer {
         await utils.enqueueTask(Queues, api, 'assets', 'createToken', alice, [
           accounts.getOwner()[1],
           chainInfo.tokenId,
-          null
+          null,
+          1
         ]);
       } else {
         await utils.enqueueTask(Queues, api, 'uniques', 'createToken', alice, [
           accounts.getOwner()[1],
           chainInfo.tokenId,
-          null
+          null,
+          1
         ]);
       }
     }

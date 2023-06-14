@@ -59,11 +59,12 @@ class ContractsMgr {
                 await SubstrateChain.deployOmniverse(global.networkMgr.networks[i], contractType);
             } else if (global.global.networkMgr.networks[i].chainType == 'INK') {
                 let address = await InkChain.deployOmniverse(global.networkMgr.networks[i], contractType);
-                global.networkMgr.networks[i].InkContract = address;
+                global.networkMgr.networks[i].INKContract = address;
             }
         }
 
         this.afterDeploy(contractType);
+        console.log(global.networkMgr.networks);
     }
 }
 

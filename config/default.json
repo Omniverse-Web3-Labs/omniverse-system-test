@@ -7,19 +7,24 @@
         "databasePath": "./submodules/omniverse-database/"
     },
     "networks": [
+        // {
+        //     "chainId": 1337,
+        //     "chainType": "EVM",
+        //     "coolingDown": 1
+        // },
+        // {
+        //     "chainId": 1337,
+        //     "chainType": "EVM",
+        //     "coolingDown": 1,
+        //     "count": 1
+        // },
+        // {
+        //     "chainType": "SUBSTRATE",
+        //     "coolingDown": 1,
+        //     "count": 1
+        // },
         {
-            "chainId": 1337,
-            "chainType": "EVM",
-            "coolingDown": 1
-        },
-        {
-            "chainId": 1337,
-            "chainType": "EVM",
-            "coolingDown": 1,
-            "count": 1
-        },
-        {
-            "chainType": "SUBSTRATE",
+            "chainType": "INK",
             "coolingDown": 1,
             "count": 1
         }
@@ -41,6 +46,10 @@
             },
             "SUBSTRATE": {
                 "compatibleChain": "substrate"
+            },
+            "INK": {
+                "omniverseContractAbiPath": "./res/INKContract.json",
+                "compatibleChain": "ink"
             }
         }
     },
@@ -62,6 +71,10 @@
             "SUBSTRATE": {
                 "chainId": 1,
                 "compatibleChain": "substrate"
+            },
+            "INK": {
+                "abiPath": "./res/INKContract.json",
+                "compatibleChain": "ink"
             }
         }
     }

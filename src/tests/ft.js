@@ -7,8 +7,6 @@ const assert = require('assert');
 const base = require('./base');
 const synchronizer = require("../synchronizer");
 const SubstrateChain = require('../contracts/substrate');
-const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
-import { ContractPromise } from '@polkadot/api-contract';
 
 class Test {
     async initialize() {
@@ -81,15 +79,19 @@ class Test {
                 item.nodeAddress = network.rpc;
                 item.coolingDown = network.coolingDown;
                 item.omniverseChainId = network.omniverseChainId;
-                item.contractAddress = network.INKContract;
-                item.metadataPath = './res/Metadata.json';
+                item.omniverseContractAddress = network.INKContract;
+                item.metadataPath = './res/INKContract.json';
                 cfg[network.chainType]?
                 cfg[network.chainType][network.chainName] = item:
                 cfg[network.chainType] = {[network.chainName]: item};
             }
         }
-        fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg['SUBSTRATE'], null, '\t'));
-        fs.writeFileSync(config.get('submodules.inkOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg['INK'], null, '\t'));
+        if (cfg['SUBSTRATE']) {
+            fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg['SUBSTRATE'], null, '\t'));
+        }
+        if (cfg['INK']) {
+            fs.writeFileSync(config.get('submodules.inkOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg['INK'], null, '\t'));
+        }
     }
     
     updateToolSecret() {
@@ -106,7 +108,7 @@ class Test {
     
     updateToolRes() {
         console.log('updateToolRes');
-        execSync('cp ./res/ink/omniverse_protocol.contract ' + config.get('submodules.inkOmniverseToolPath') + 'res/Metadata.json');
+        execSync('cp ./res/ink/omniverse_protocol.contract ' + config.get('submodules.inkOmniverseToolPath') + 'res/INKContract.json');
         // execSync('cp ' + config.get('') + 'build/contracts/.json ' + config.get('') + 'res/');
         // execSync('cd ' + config.get('') + ' && echo -n ' + '' + ' > .secret');
     }
@@ -187,7 +189,7 @@ class Test {
 
     async afterRestore(network, index) {
         console.log('afterRestore');
-        await utils.sleep(5);
+        await utils.sleep(500);
         let users = accounts.getUsers()[1];
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);

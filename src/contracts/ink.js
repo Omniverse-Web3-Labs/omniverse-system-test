@@ -8,7 +8,6 @@ async function deployContract(tx, keyPair) {
   return new Promise(async (resolve, reject) => {
     let address;
     const unsub = await tx.signAndSend(keyPair, ({ contract, status }) => {
-      console.log('contract', contract)
       if (status.isInBlock || status.isFinalized) {
         address = contract.address.toString();
         unsub();
@@ -45,21 +44,21 @@ class InkDeployer {
         owner.address,
         amount,
       ]);
-      console.log('ret', ret);
-      await utils.sleep(5);
     }
 
     // Deploy
     let metadata = JSON.parse(fs.readFileSync('./res/ink/omniverse_protocol.contract'));
     const code = new CodePromise(api, metadata, metadata.source.wasm);
     // maximum gas to be consumed for the instantiation. if limit is too small the instantiation will fail.
-    const gasLimit = 1000000n * 1000000n;
+    const gasLimit = api.registry.createType('WeightV2', {
+      refTime: "10000000000",
+      proofSize: "10000000000",
+    });
     // a limit to how much Balance to be used to pay for the storage created by the instantiation
     // if null is passed, unlimited balance can be used
     const storageDepositLimit = null;
 
     const tx = code.tx.new({ gasLimit, storageDepositLimit }, chainInfo.omniverseChainId, accounts.getOwner()[1], 'FT', 'FT');
-
     let contractAddress = await deployContract(tx, owner);
     return contractAddress;
   }

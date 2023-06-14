@@ -1,5 +1,6 @@
 const EVMChain = require('./EVMChain');
 const SustrateChain = require('./substrate');
+const InkChain = require('./ink');
 
 class NodesMgr {
     constructor() {
@@ -23,9 +24,14 @@ class NodesMgr {
             if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
                 global.networkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
-            } else {
+            }
+            else if (global.networkMgr.networks[i].chainType == 'EVM') {
                 global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
                 global.networkMgr.networks[i].ws = 'http://127.0.0.1:' + this.port;
+            }
+            else if (global.networkMgr.networks[i].chainType == 'INK') {
+                global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
+                global.networkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
             }
             global.networkMgr.networks[i].port = this.port;
             this.nodesInfo[i] = this.port++;
@@ -43,6 +49,8 @@ class NodesMgr {
             Childs.push(EVMChain.launch(this.port, chainInfo));
         } else if (chainInfo.chainType == 'SUBSTRATE') {
             Childs.push(SustrateChain.launch(this.port, chainInfo));
+        } else if (chainInfo.chainType == 'INK') {
+            Childs.push(InkChain.launch(this.port, chainInfo));
         }
         
     }

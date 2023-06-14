@@ -6,7 +6,9 @@ const accounts = require('../utils/accounts');
 const assert = require('assert');
 const base = require('./base');
 const synchronizer = require("../synchronizer");
-const SubstrateChain = require('../contracts/substrate')
+const SubstrateChain = require('../contracts/substrate');
+const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
+import { ContractPromise } from '@polkadot/api-contract';
 
 class Test {
     async initialize() {
@@ -19,6 +21,9 @@ class Test {
                 item = '"' + network.omniverseChainId + '|' + network.EVMContract + '"';
             } else if (network.chainType == 'SUBSTRATE') {
                 let tokenId = '0x' + Buffer.from(network.tokenId).toString('hex');
+                item = '"' + network.omniverseChainId + '|' + tokenId + '"';
+            } else if (network.chainType == 'INK') {
+                let tokenId = '0x' + Buffer.from(network.INKContract).toString('hex');
                 item = '"' + network.omniverseChainId + '|' + tokenId + '"';
             }
             
@@ -38,6 +43,10 @@ class Test {
                 cmd = 'cd ' + config.get('submodules.omniverseContractPath') + ' && node register/index.js -i ' + network.chainName + ',' + allienceInfo;
                 execSync(cmd);
             }
+            else if (network.chainType == 'INK') {
+                cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -i ' + network.chainName + ',' + allienceInfo;
+                execSync(cmd);
+            }
         }
 
         await SubstrateChain.setMembers('ft');
@@ -46,6 +55,9 @@ class Test {
         console.log('Waiting for transfering substrate native token')
         for (let i in networkMgr.networks) {
             if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+                await base.transferSubstrateNativeToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
+            }
+            else if (networkMgr.networks[i].chainType == 'INK') {
                 await base.transferSubstrateNativeToken(networkMgr.networks[i], users, accounts.getPorters()[0]);
             }
         }
@@ -61,10 +73,23 @@ class Test {
                 item.nodeAddress = network.rpc;
                 item.tokenId = network.tokenId;
                 item.omniverseChainId = network.omniverseChainId;
-                cfg[network.chainName] = item;
+                cfg[network.chainType]?
+                cfg[network.chainType][network.chainName] = item:
+                cfg[network.chainType] = {[network.chainName]: item};
+            }
+            else if (network.chainType == 'INK') {
+                item.nodeAddress = network.rpc;
+                item.coolingDown = network.coolingDown;
+                item.omniverseChainId = network.omniverseChainId;
+                item.contractAddress = network.INKContract;
+                item.metadataPath = './res/Metadata.json';
+                cfg[network.chainType]?
+                cfg[network.chainType][network.chainName] = item:
+                cfg[network.chainType] = {[network.chainName]: item};
             }
         }
-        fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg['SUBSTRATE'], null, '\t'));
+        fs.writeFileSync(config.get('submodules.inkOmniverseToolPath') + 'config/default.json', JSON.stringify(cfg['INK'], null, '\t'));
     }
     
     updateToolSecret() {
@@ -76,11 +101,12 @@ class Test {
         secretCfg.mpc = secretCfg.sks[0];
         fs.writeFileSync(config.get('submodules.omniverseToolPath') + 'register/.secret', JSON.stringify(secretCfg, null, '\t'));
         fs.writeFileSync(config.get('submodules.substrateOmniverseToolPath') + '.secret', JSON.stringify(secretCfg, null, '\t'));
+        fs.writeFileSync(config.get('submodules.inkOmniverseToolPath') + '.secret', JSON.stringify(secretCfg, null, '\t'));
     }
     
     updateToolRes() {
         console.log('updateToolRes');
-        // execSync('cp ' + config.get('') + 'build/contracts/.json ' + config.get('') + 'res/');
+        execSync('cp ./res/ink/omniverse_protocol.contract ' + config.get('submodules.inkOmniverseToolPath') + 'res/Metadata.json');
         // execSync('cp ' + config.get('') + 'build/contracts/.json ' + config.get('') + 'res/');
         // execSync('cd ' + config.get('') + ' && echo -n ' + '' + ' > .secret');
     }

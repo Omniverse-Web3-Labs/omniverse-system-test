@@ -22,6 +22,12 @@ module.exports = {
             cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -m ' + chainName + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(3);
+        } else if (chainType == 'INK') {
+            let cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -s 0';
+            execSync(cmd);
+            cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -m ' + chainName + ',' + to + ',' + token;
+            execSync(cmd);
+            await utils.sleep(3);
         }
     },
 
@@ -38,6 +44,12 @@ module.exports = {
             cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -t ' + chainName + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(3);
+        } else if (chainType == 'INK') {
+            let cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -s ' + fromIndex;
+            execSync(cmd);
+            cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -t ' + chainName + ',' + to + ',' + token;
+            execSync(cmd);
+            await utils.sleep(3);
         }
     },
 
@@ -48,6 +60,9 @@ module.exports = {
             ret = execSync(cmd);
         } else if (chainType == 'SUBSTRATE') {
             let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -o ' + chainName + ',' + account;
+            ret = execSync(cmd);
+        } else if (chainType == 'INK') {
+            let cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -o ' + chainName + ',' + account;
             ret = execSync(cmd);
         }
         return ret;

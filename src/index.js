@@ -24,6 +24,8 @@ function install() {
     execSync(cmd);
     cmd = "cd " + config.get('submodules.substrateOmniverseToolPath') + " && npm install";
     execSync(cmd);
+    cmd = "cd " + config.get('submodules.inkOmniverseToolPath') + " && npm install";
+    execSync(cmd);
 }
 
 async function init() {

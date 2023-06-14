@@ -32,6 +32,12 @@ class Synchronizer {
                 } else {
                     item.pallets = ['uniques'];
                 }
+            } else if (network.chainType == 'INK') {
+                item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.INK")));
+                item.contractAddress = global.networkMgr.networks[i].INKContract;
+                item.nodeAddress = network.ws;
+                item.omniverseChainId = network.omniverseChainId;
+                console.log(item);
             }
             cfg.networks[network.chainName] = item;
         }

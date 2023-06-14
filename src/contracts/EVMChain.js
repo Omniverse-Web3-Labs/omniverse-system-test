@@ -69,6 +69,7 @@ class EVMChainDeployer {
                 execSync(cmd).toString();
             }
             catch (e) {
+                console.log(e)
                 continue;
             }
             break;

@@ -29,6 +29,9 @@ class Database {
                     item.pallets = ['uniques'];
                 }
                 console.log(item);
+            } else if (network.chainType == 'INK') {
+                item.contractAddress = global.networkMgr.networks[i].INKContract;
+                console.log(item);
             }
             cfg.networks[network.chainName] = item;
         }

@@ -2,6 +2,7 @@ const config = require('config');
 const { execSync } = require("child_process");
 const EVMChain = require('./EVMChain');
 const SubstrateChain = require('./substrate');
+const InkChain = require('./ink');
 
 class ContractsMgr {
     constructor() {
@@ -13,10 +14,10 @@ class ContractsMgr {
     }
 
     async afterDeploy(contractType) {
-        let omniverseCfg = JSON.parse(fs.readFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json').toString());
         for (let i in global.networkMgr.networks) {
             let network = global.networkMgr.networks[i];
             if (network.chainType == 'EVM') {
+                let omniverseCfg = JSON.parse(fs.readFileSync(config.get('submodules.omniverseContractPath') + 'config/default.json').toString());
                 if (contractType == 'ft') {
                     network.EVMContract = omniverseCfg[network.chainName].skywalkerFungibleAddress;
                 }
@@ -24,6 +25,11 @@ class ContractsMgr {
                     network.EVMContract = omniverseCfg[network.chainName].skywalkerNonFungibleAddress;
                 }
             }
+            // else if (network.chainType == 'INK') {
+            //     if (contractType == 'ft') {
+            //         network.EVMContract = omniverseCfg[network.chainName].skywalkerFungibleAddress;
+            //     }
+            // }
         }
 
         if (contractType == 'ft') {
@@ -44,13 +50,16 @@ class ContractsMgr {
                 await EVMChain.deployOmniverse(global.networkMgr.networks[i]);
             } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
                 if (contractType == 'ft') {
-                    networkMgr.networks[i].pallet = ['assets'];
-                    networkMgr.networks[i].tokenId = 'FT';
+                    global.networkMgr.networks[i].pallet = ['assets'];
+                    global.networkMgr.networks[i].tokenId = 'FT';
                 } else if (contractType == 'nft') {
-                    networkMgr.networks[i].pallet = ['uniques'];
-                    networkMgr.networks[i].tokenId = 'NFT';
+                    global.networkMgr.networks[i].pallet = ['uniques'];
+                    global.networkMgr.networks[i].tokenId = 'NFT';
                 }
-                await SubstrateChain.deployOmniverse(networkMgr.networks[i], contractType);
+                await SubstrateChain.deployOmniverse(global.networkMgr.networks[i], contractType);
+            } else if (global.global.networkMgr.networks[i].chainType == 'INK') {
+                let address = await InkChain.deployOmniverse(global.networkMgr.networks[i], contractType);
+                global.networkMgr.networks[i].InkContract = address;
             }
         }
 

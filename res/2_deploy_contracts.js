@@ -31,7 +31,7 @@ module.exports = async function (deployer, network) {
       await deployer.deploy(SkywalkerNonFungible, chain.omniverseChainId, tokenInfo.name, tokenInfo.symbol)
       let address = jsonData[network].skywalkerNonFungibleAddress;
       address = address ? address : {};
-      address[tokenInfo.name] = SkywalkerFungible.address;
+      address[tokenInfo.name] = SkywalkerNonFungible.address;
       jsonData[network].skywalkerNonFungibleAddress = address;
     }
   }

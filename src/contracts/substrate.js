@@ -51,6 +51,15 @@ class SubstrateDeployer {
           null,
           1,
         ]);
+        let assetId = (
+          await api.query.assets.tokenId2AssetId(tokenInfo.name)
+        ).toJSON();
+        await utils.enqueueTask(Queues, api, 'assets', 'setMetadata', owner, [
+          assetId,
+          tokenInfo.name,
+          tokenInfo.symbol,
+          12,
+        ]);
       } else {
         await utils.enqueueTask(Queues, api, 'uniques', 'createToken', alice, [
           accounts.getOwner()[1],
@@ -60,15 +69,6 @@ class SubstrateDeployer {
         ]);
       }
     }
-    let assetId = (
-      await api.query.assets.tokenId2AssetId(tokenInfo.name)
-    ).toJSON();
-    await utils.enqueueTask(Queues, api, 'assets', 'setMetadata', owner, [
-      assetId,
-      tokenInfo.name,
-      tokenInfo.symbol,
-      12,
-    ]);
     console.log('Substrate waiting for in block');
   }
 

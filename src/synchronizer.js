@@ -64,7 +64,7 @@ class Synchronizer {
     }
 
     beforeLaunch() {
-        execSync('cd ' + config.get('submodules.synchronizerPath') + ' && if [ -f ".state" ]; then rm .state; fi');
+        execSync('cd ' + config.get('submodules.synchronizerPath') + ' && if [ -f ".state" ]; then rm .state; fi && if [ -f "out.log" ]; then rm out.log; fi');
     }
 
     async launch() {

@@ -27,7 +27,7 @@ module.exports = {
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -m ' + chainName + ',' + to + ',' + token;
             let ret = execSync(cmd);
-            console.log('ret111', ret.toString());
+            console.log('mint', ret.toString());
             await utils.sleep(3);
         }
     },
@@ -49,7 +49,8 @@ module.exports = {
             let cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -s ' + fromIndex;
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -t ' + chainName + ',' + to + ',' + token;
-            execSync(cmd);
+            let ret = execSync(cmd);
+            console.log('transfer', ret.toString());
             await utils.sleep(3);
         }
     },

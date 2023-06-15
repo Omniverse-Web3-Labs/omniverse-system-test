@@ -4,7 +4,6 @@ const ftTest = require('./tests/ft');
 const nftTest = require('./tests/nft');
 const config = require('config');
 const accounts = require('./utils/accounts');
-const database = require('./database');
 const { program } = require('commander');
 const { execSync } = require("child_process");
 const synchronizer = require('./synchronizer');
@@ -19,8 +18,6 @@ function install() {
     let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npm install";
     execSync(cmd);
     cmd = "cd " + config.get('submodules.synchronizerPath') + " && npm install";
-    execSync(cmd);
-    cmd = "cd " + config.get('submodules.databasePath') + " && npm install";
     execSync(cmd);
     cmd = "cd " + config.get('submodules.substrateOmniverseToolPath') + " && npm install";
     execSync(cmd);
@@ -61,11 +58,6 @@ async function deploy(contractType) {
     await contracts.deploy(contractType);
 
     ////////////////////////////////////////////////////////
-    //                  Prepare Database                  //
-    ////////////////////////////////////////////////////////
-    database.prepare(contractType);
-
-    ////////////////////////////////////////////////////////
     //                Prepare Synchronizer                //
     ////////////////////////////////////////////////////////
     synchronizer.prepare(contractType);
@@ -92,11 +84,6 @@ async function test(contractType) {
 
     // Deploy
     await deploy(contractType);
-
-    ////////////////////////////////////////////////////////
-    //                  Launch Database                   //
-    ////////////////////////////////////////////////////////
-    await database.launch(contractType);
 
     // Run test cases
     await tests.runTest();

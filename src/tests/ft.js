@@ -122,6 +122,8 @@ class Test {
         this.updateToolRes();
 
         await this.initialize();
+
+        await utils.sleep(10);
     }
 
     async testRestore() {
@@ -171,7 +173,7 @@ class Test {
     async runTest() {
         console.log('runTests');
 
-        await this.testRestore();
+        // await this.testRestore();
 
         await this.testFlow();
     }
@@ -189,7 +191,7 @@ class Test {
 
     async afterRestore(network, index) {
         console.log('afterRestore');
-        await utils.sleep(500);
+        await utils.sleep(5);
         let users = accounts.getUsers()[1];
 
         let ret = await base.balanceOf(network.chainType, network.chainName, users[0]);

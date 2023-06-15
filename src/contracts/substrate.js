@@ -1,13 +1,32 @@
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
 const accounts = require('../utils/accounts');
+const config = require('config');
 const utils = require('../utils/utils');
 class SubstrateDeployer {
   constructor() {
-    this.contracts = {};
+    this.tokenInfo = {};
   }
 
-  async deployOmniverse(chainInfo, contractType) {
-    console.log('deployOmniverse', chainInfo);
+  beforeDeploy(contractType, count) {
+    let networks = global.networkMgr.getNetworksByType('SUBSTRATE');
+    for (let i in networks) {
+      let template = config.get('tokenInfo')[contractType];
+      // console.log(template[0])
+      this.tokenInfo[networks[i].chainName] = [];
+      this.tokenInfo[networks[i].chainName].push({ ...template[0] });
+      if (template.length != count) {
+        for (let j = 1; j < count; ++j) {
+          this.tokenInfo[networks[i].chainName].push({
+            name: template[0].name + j,
+            symbol: template[0].symbol + j,
+          });
+        }
+      }
+    }
+  }
+
+  async deployOmniverse(chainInfo, contractType, tokenInfo) {
+    console.log('Substrate deploy omniverse', chainInfo);
     let keyring = new Keyring({ type: 'ecdsa' });
     let owner = keyring.addFromSeed(
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))
@@ -28,23 +47,32 @@ class SubstrateDeployer {
       if (contractType == 'ft') {
         await utils.enqueueTask(Queues, api, 'assets', 'createToken', alice, [
           accounts.getOwner()[1],
-          chainInfo.tokenId,
+          tokenInfo.name,
           null,
-          1
+          1,
         ]);
       } else {
         await utils.enqueueTask(Queues, api, 'uniques', 'createToken', alice, [
           accounts.getOwner()[1],
-          chainInfo.tokenId,
+          tokenInfo.name,
           null,
-          1
+          1,
         ]);
       }
     }
+    let assetId = (
+      await api.query.assets.tokenId2AssetId(tokenInfo.name)
+    ).toJSON();
+    await utils.enqueueTask(Queues, api, 'assets', 'setMetadata', owner, [
+      assetId,
+      tokenInfo.name,
+      tokenInfo.symbol,
+      12,
+    ]);
     console.log('Substrate waiting for in block');
   }
 
-  async setMembers(contractType) {
+  async setMembers(contractType, tokenId) {
     console.log('Substrate set members');
     let keyring = new Keyring({ type: 'ecdsa' });
     let owner = keyring.addFromSeed(
@@ -62,21 +90,22 @@ class SubstrateDeployer {
           let network = global.networkMgr.networks[j];
           if (j != i) {
             if (network.chainType == 'EVM') {
-              members.push([network.omniverseChainId, network.EVMContract]);
+              let member = network.EVMContract[tokenId];
+              members.push([network.omniverseChainId, member]);
             } else if (network.chainType == 'SUBSTRATE') {
-              members.push([omniverseChainId, network.tokenId]);
+              members.push([omniverseChainId, tokenId]);
             }
           }
         }
         if (contractType == 'ft') {
           await utils.enqueueTask(Queues, api, 'assets', 'setMembers', owner, [
-            networkMgr.networks[i].tokenId,
-            members
+            tokenId,
+            members,
           ]);
         } else {
           await utils.enqueueTask(Queues, api, 'uniques', 'setMembers', owner, [
-            networkMgr.networks[i].tokenId,
-            members
+            tokenId,
+            members,
           ]);
         }
       }

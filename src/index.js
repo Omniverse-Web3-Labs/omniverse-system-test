@@ -11,7 +11,6 @@ const synchronizer = require('./synchronizer');
 const { queue } = require('async');
 const { substrateTxWorker } = require('./utils/utils');
 global.networkMgr = require('./utils/networkMgr');
-global.Childs = [];
 global.Queues = queue(substrateTxWorker, 1);
 
 function install() {
@@ -31,7 +30,7 @@ async function init() {
     global.networkMgr.init();
 }
 
-async function deploy(contractType) {
+async function deploy(contractType, count) {
     let tests;
     if (contractType == 'ft') {
         tests = ftTest;
@@ -56,7 +55,7 @@ async function deploy(contractType) {
     ////////////////////////////////////////////////////////
     //                  Deploy Contracts                  //
     ////////////////////////////////////////////////////////
-    await contracts.deploy(contractType);
+    await contracts.deploy(contractType, count);
 
     ////////////////////////////////////////////////////////
     //                  Prepare Database                  //
@@ -71,12 +70,12 @@ async function deploy(contractType) {
     ////////////////////////////////////////////////////////
     //                  Initialize Tests                  //
     ////////////////////////////////////////////////////////
-    await tests.prepare();
+    await tests.prepare(count);
 
     console.log('Deploy completed');
 }
 
-async function test(contractType) {
+async function test(contractType, count) {
     let tests;
     if (contractType == 'ft') {
         tests = ftTest;
@@ -89,7 +88,7 @@ async function test(contractType) {
     }
 
     // Deploy
-    await deploy(contractType);
+    await deploy(contractType, count);
 
     ////////////////////////////////////////////////////////
     //                  Launch Database                   //
@@ -100,29 +99,36 @@ async function test(contractType) {
     await tests.runTest();
 
     console.log('Success');
+    process.exit();
 }
 
 (async function () {
     program
         .version('0.1.0')
         .option('-i, --install', 'Install environment')
-        .option('-t, --test <app name>', 'Test application')
+        .option('-t, --test <app name>, <count>', 'Test application')
         .option('-d, --deploy <app name>', 'Deploy contracts')
+        .option('-c, --count <number>', 'The number of contracts to be deployed')
         .parse(process.argv);
-
+    
+    let count = program.opts().count ? Number(program.opts().count) : 1;
     if (program.opts().install) {
         install();
     }
     else if (program.opts().test) {
-        await test(program.opts().test);
+        await test(program.opts().test, count);
     }
     else if (program.opts().deploy) {
-        await deploy(program.opts().deploy);
+        await deploy(program.opts().deploy, count);
     }
 }());
 
 process.on('unhandledRejection', (err) => {
     console.log('UnhanledRejection', err);
+    process.kill(-process.pid);
+})
+
+process.on('exit', () => {
     process.kill(-process.pid);
 })
 

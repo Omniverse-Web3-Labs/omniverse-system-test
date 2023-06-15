@@ -2,6 +2,7 @@ const { execSync, spawn } = require('child_process');
 const accounts = require('./utils/accounts');
 const config = require('config');
 const utils = require('./utils/utils');
+const Database = require('./database');
 
 class Synchronizer {
     constructor() {
@@ -35,6 +36,8 @@ class Synchronizer {
             }
             cfg.networks[network.chainName] = item;
         }
+        let database = cfg.database.replace('port', Database.port);
+        cfg.database = database;
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/default.json', JSON.stringify(cfg, null, '\t'));
     }
     

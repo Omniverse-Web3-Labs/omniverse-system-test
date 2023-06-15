@@ -6,6 +6,16 @@
         "substrateOmniverseToolPath": "./submodules/omniverse-swap-tools/omniverse-helper/",
         "databasePath": "./submodules/omniverse-database/"
     },
+    "tokenInfo": {
+        "ft": [{
+            "name": "SKYWALKER",
+            "symbol": "SKYWALKER"
+        }],
+        "nft": [{
+            "name": "SKYWALKERNFT",
+            "symbol": "SKYWALKERNFT"
+        }]
+    },
     "networks": [
         {
             "chainId": 1337,
@@ -49,7 +59,7 @@
         "logLevel": "debug",
         "secret": "config/.secret",
         "stateDB": ".state",
-        "database": "http://127.0.0.1:8866/omniverse/v1/pending",
+        "database": "http://127.0.0.1:port/omniverse/v1/pending",
         "payload": {
             "keys": ["op", "exData", "amount"],
             "types": ["uint8", "bytes", "uint256"]

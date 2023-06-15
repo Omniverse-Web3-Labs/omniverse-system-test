@@ -9,17 +9,30 @@ class EVMChainDeployer {
         this.contracts = {};
     }
 
-    beforeDeploy() {
-        this.updateConfig();
+    beforeDeploy(contractType, count) {
+        this.updateConfig(contractType, count);
         this.updateMigrationScript();
         this.updateTruffleConfig();
     }
 
-    updateConfig() {
+    updateConfig(contractType, count) {
         console.log('EVMChainDeployer update Config');
         let cfg = {};
         let networks = global.networkMgr.getNetworksByType('EVM');
         for (let i in networks) {
+            let template = config.get('tokenInfo')[contractType];
+            let contract = { tokenInfo: [{...template[0] }] };
+            contract['omniverseChainId'] = networks[i].omniverseChainId;
+            contract['contractType'] = contractType;
+            if (template.length != count) {
+                for (let j = 1; j < count; ++j) {
+                    contract.tokenInfo.push({
+                        name: contract.tokenInfo[0].name + j,
+                        symbol: contract.tokenInfo[0].symbol + j,
+                    })
+                }
+            }
+            this.contracts[networks[i].chainName] = contract;
             let item = {};
             item.nodeAddress = networks[i].rpc;
             item.chainId = networks[i].chainId;
@@ -32,14 +45,9 @@ class EVMChainDeployer {
     
     updateMigrationScript() {
         console.log('EVMChainDeployer updateMigrationScript');
-        let str = '';
-        let networks = global.networkMgr.getNetworksByType('EVM');
-        for (let i in networks) {
-            str += networks[i].chainName + ': ' + networks[i].omniverseChainId + ',\n';
-        }
-        console.log('migrate networks', str);
+        console.log('migrate networks', this.contracts);
         let migrationScript = fs.readFileSync('./res/2_deploy_contracts.js').toString();
-        migrationScript = migrationScript.replace('CHAINS_ID_TEMPLATE', str);
+        migrationScript = migrationScript.replace('CHAINS_ID_TEMPLATE', JSON.stringify(this.contracts));
         fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'migrations/2_deploy_contracts.js', migrationScript);
     }
     
@@ -58,9 +66,9 @@ class EVMChainDeployer {
         fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'truffle-config.js', truffleConfigStr);
     }
 
-    async deployOmniverse(chainInfo) {
-        console.log('deployOmniverse', chainInfo);
-        execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[0].slice(2) + " > .secret");
+    deployOmniverse(chainInfo) {
+        console.log('EVM deploy omniverse', chainInfo);
+        execSync("cd " + config.get('submodules.omniverseContractPath') + " && printf " + accounts.getOwner()[0].slice(2) + " > .secret");
 
         let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName + " --skip-dry-run";
         while (true) {
@@ -69,6 +77,7 @@ class EVMChainDeployer {
                 execSync(cmd).toString();
             }
             catch (e) {
+                console.log(e)
                 continue;
             }
             break;

@@ -25,6 +25,10 @@ class Test {
         } else if (network.chainType == 'SUBSTRATE') {
           let name = '0x' + Buffer.from(tokenId).toString('hex');
           item = '"' + network.omniverseChainId + '|' + name + '"';
+        } else if (network.chainType == 'INK') {
+          let tokenId =
+            '0x' + Buffer.from(network.INKContract[tokenId]).toString('hex');
+          item = '"' + network.omniverseChainId + '|' + tokenId + '"';
         }
 
         if (allienceInfo == '') {
@@ -49,6 +53,17 @@ class Test {
             allienceInfo +
             subCommand;
           execSync(cmd);
+        } else if (network.chainType == 'INK') {
+          let subCommand = ' -ti ' + tokenId;
+          cmd =
+            'cd ' +
+            config.get('submodules.inkOmniverseToolPath') +
+            ' && node index.js -i ' +
+            network.chainName +
+            ',' +
+            allienceInfo +
+            subCommand;
+          execSync(cmd);
         }
       }
       await SubstrateChain.setMembers('ft', tokenId);
@@ -65,12 +80,18 @@ class Test {
           users,
           accounts.getPorters()[0]
         );
+      } else if (networkMgr.networks[i].chainType == 'INK') {
+        await base.transferSubstrateNativeToken(
+          networkMgr.networks[i],
+          users,
+          accounts.getPorters()[0]
+        );
       }
     }
   }
 
   updateToolConfig() {
-    console.log('updateToolConfig');
+    console.log('Test updateToolConfig');
     let cfg = {};
     for (let i in global.networkMgr.networks) {
       let item = {};
@@ -79,19 +100,37 @@ class Test {
         item.nodeAddress = network.rpc;
         item.tokenId = network.tokenId;
         item.omniverseChainId = network.omniverseChainId;
-        cfg[network.chainName] = item;
+        cfg[network.chainType]
+          ? (cfg[network.chainType][network.chainName] = item)
+          : (cfg[network.chainType] = { [network.chainName]: item });
+      } else if (network.chainType == 'INK') {
+        item.nodeAddress = network.rpc;
+        item.coolingDown = network.coolingDown;
+        item.omniverseChainId = network.omniverseChainId;
+        item.omniverseContractAddress = network.INKContract;
+        item.metadataPath = './res/INKContract.json';
+        cfg[network.chainType]
+          ? (cfg[network.chainType][network.chainName] = item)
+          : (cfg[network.chainType] = { [network.chainName]: item });
       }
     }
-    fs.writeFileSync(
-      config.get('submodules.substrateOmniverseToolPath') +
-        'config/default.json',
-      JSON.stringify(cfg, null, '\t')
-    );
+    if (cfg['SUBSTRATE']) {
+      fs.writeFileSync(
+        config.get('submodules.substrateOmniverseToolPath') +
+          'config/default.json',
+        JSON.stringify(cfg['SUBSTRATE'], null, '\t')
+      );
+    }
+    if (cfg['INK']) {
+      fs.writeFileSync(
+        config.get('submodules.inkOmniverseToolPath') + 'config/default.json',
+        JSON.stringify(cfg['INK'], null, '\t')
+      );
+    }
   }
 
   updateToolSecret() {
     console.log('Test updateToolSecret');
-    console.log('For EVM');
     let secretCfg = {};
     secretCfg.sks = accounts.getAll()[0];
     secretCfg.index = 0;
@@ -103,17 +142,29 @@ class Test {
       config.get('submodules.substrateOmniverseToolPath') + '.secret',
       JSON.stringify(secretCfg, null, '\t')
     );
+    fs.writeFileSync(
+      config.get('submodules.inkOmniverseToolPath') + '.secret',
+      JSON.stringify(secretCfg, null, '\t')
+    );
   }
 
   updateToolRes() {
-    console.log('updateToolRes');
-    // execSync('cp ' + config.get('') + 'build/contracts/.json ' + config.get('') + 'res/');
+    console.log('Test updateToolRes');
+    execSync(
+      'cp ./res/ink/omniverse_protocol.contract ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        'res/INKContract.json'
+    );
     // execSync('cp ' + config.get('') + 'build/contracts/.json ' + config.get('') + 'res/');
     // execSync('cd ' + config.get('') + ' && echo -n ' + '' + ' > .secret');
   }
 
   async prepare() {
-    console.log('Test prepare');
+    console.log(
+      '///////////////////////////////////////////////////\n\
+//             Prepare for Testing               //\n\
+///////////////////////////////////////////////////'
+    );
     this.updateToolConfig();
 
     this.updateToolSecret();
@@ -121,10 +172,16 @@ class Test {
     this.updateToolRes();
 
     await this.initialize();
+
+    await utils.sleep(10);
   }
 
   async testRestore() {
-    console.log('testRestore');
+    console.log(
+      '///////////////////////////////////////////////////\n\
+//               Test work Restore               //\n\
+///////////////////////////////////////////////////'
+    );
     let index = 1;
     for (let i in global.networkMgr.networks) {
       console.log(global.networkMgr.networks[i].chainType, index);
@@ -144,8 +201,28 @@ class Test {
     }
   }
 
+  updateToolSecret() {
+    console.log('Test updateToolSecret');
+    console.log('For EVM');
+    let secretCfg = {};
+    secretCfg.sks = accounts.getAll()[0];
+    secretCfg.index = 0;
+    fs.writeFileSync(
+      config.get('submodules.omniverseToolPath') + 'register/.secret',
+      JSON.stringify(secretCfg, null, '\t')
+    );
+    fs.writeFileSync(
+      config.get('submodules.substrateOmniverseToolPath') + '.secret',
+      JSON.stringify(secretCfg, null, '\t')
+    );
+  }
+
   async testFlow(doSwap) {
-    console.log('test flow');
+    console.log(
+      '///////////////////////////////////////////////////\n\
+//                 Test Workflow                 //\n\
+///////////////////////////////////////////////////'
+    );
     // Launch synchronizer
     await synchronizer.launch();
     if (doSwap) {

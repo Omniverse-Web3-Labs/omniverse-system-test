@@ -1,5 +1,7 @@
 const EVMChain = require('./EVMChain');
 const SustrateChain = require('./substrate');
+const InkChain = require('./ink');
+const utils = require('../utils/utils');
 
 class NodesMgr {
   constructor() {
@@ -14,6 +16,11 @@ class NodesMgr {
    * @method launch Launch nodes for testing
    */
   launch() {
+    console.log(
+'///////////////////////////////////////////////////\n\
+//                 Luanch Nodes                  //\n\
+///////////////////////////////////////////////////'
+    );
     for (let i in global.networkMgr.networks) {
       if (global.networkMgr.networks[i].rpc) {
         continue;
@@ -22,13 +29,17 @@ class NodesMgr {
       if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
         global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
         global.networkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
-      } else {
+      } else if (global.networkMgr.networks[i].chainType == 'EVM') {
         global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
         global.networkMgr.networks[i].ws = 'http://127.0.0.1:' + this.port;
+      } else if (global.networkMgr.networks[i].chainType == 'INK') {
+        global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
+        global.networkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
       }
       global.networkMgr.networks[i].port = this.port;
       this.nodesInfo[i] = this.port++;
     }
+    console.log('All nodes information:', global.networkMgr.networks);
   }
 
   /**
@@ -42,6 +53,8 @@ class NodesMgr {
       EVMChain.launch(this.port, chainInfo);
     } else if (chainInfo.chainType == 'SUBSTRATE') {
       SustrateChain.launch(this.port, chainInfo);
+    } else if (chainInfo.chainType == 'INK') {
+      InkChain.launch(this.port, chainInfo);
     }
   }
 

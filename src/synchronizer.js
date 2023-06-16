@@ -33,6 +33,11 @@ class Synchronizer {
                 } else {
                     item.pallets = ['uniques'];
                 }
+            } else if (network.chainType == 'INK') {
+                item = JSON.parse(JSON.stringify(config.get("synchronizer.networkTemp.INK")));
+                item.omniverseContractAddress = global.networkMgr.networks[i].INKContract;
+                item.nodeAddress = network.ws;
+                item.omniverseChainId = network.omniverseChainId;
             }
             cfg.networks[network.chainName] = item;
         }
@@ -44,6 +49,7 @@ class Synchronizer {
     updateRes() {
         console.log('Synchronizer updateRes');
         execSync('mkdir -p ' + config.get('submodules.synchronizerPath') + 'res && cp ' + config.get('submodules.omniverseContractPath') + 'build/contracts/EVMContract.json ' + config.get('submodules.synchronizerPath') + 'res/EVMContract.json');
+        execSync('mkdir -p ' + config.get('submodules.synchronizerPath') + 'res && cp ./res/ink/omniverse_protocol.contract ' + config.get('submodules.synchronizerPath') + 'res/INKContract.json');
     }
     
     updateSecret() {
@@ -55,12 +61,19 @@ class Synchronizer {
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/.secret', JSON.stringify(secretCfg, null, '\t'));
     }
 
-    prepare(contractType) {
+    async prepare(contractType) {
+        console.log(
+'///////////////////////////////////////////////////\n\
+//           Prepare for Synchronizer            //\n\
+///////////////////////////////////////////////////'
+        );
         this.updateConfig(contractType);
 
         this.updateRes();
 
         this.updateSecret();
+
+        await utils.sleep(5);
     }
 
     beforeLaunch() {

@@ -24,37 +24,16 @@
             "coolingDown": 1
         },
         {
-            "chainId": 1337,
-            "chainType": "EVM",
+            "chainType": "SUBSTRATE",
             "coolingDown": 1,
             "count": 1
         },
         {
-            "chainType": "SUBSTRATE",
-            "coolingDown": 1,
+            "chainType": "INK",
+            "coolingDown": 0,
             "count": 1
         }
     ],
-    "database": {
-        "scanInterval": 1,
-        "logLevel": "debug",
-        "secret": "config/.secret",
-        "database": "omniverse.db",
-        "stateDB": ".state",
-        "payload": {
-            "keys": ["op", "exData", "amount"],
-            "types": ["uint8", "bytes", "uint256"]
-        },
-        "networkTemp": {
-            "EVM": {
-                "omniverseContractAbiPath": "./res/EVMContract.json",
-                "compatibleChain": "ethereum"
-            },
-            "SUBSTRATE": {
-                "compatibleChain": "substrate"
-            }
-        }
-    },
     "synchronizer": {
         "scanInterval": 1,
         "logLevel": "debug",
@@ -73,6 +52,10 @@
             "SUBSTRATE": {
                 "chainId": 1,
                 "compatibleChain": "substrate"
+            },
+            "INK": {
+                "abiPath": "./res/INKContract.json",
+                "compatibleChain": "ink"
             }
         }
     }

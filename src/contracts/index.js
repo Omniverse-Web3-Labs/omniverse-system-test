@@ -2,6 +2,8 @@ const config = require('config');
 const { execSync } = require('child_process');
 const EVMChain = require('./EVMChain');
 const SubstrateChain = require('./substrate');
+const InkChain = require('./ink');
+const utils = require('../utils/utils');
 
 class ContractsMgr {
   constructor() {
@@ -49,8 +51,19 @@ class ContractsMgr {
   }
 
   async deploy(contractType, count) {
+    console.log(
+      '///////////////////////////////////////////////////\n\
+      //               Deploy Contracts                //\n\
+      ///////////////////////////////////////////////////'
+    );
     this.beforeDeploy(contractType, count);
+
     for (let i in global.networkMgr.networks) {
+      console.log(
+        'Deploy',
+        global.networkMgr.networks[i].chainName,
+        global.networkMgr.networks[i].chainType
+      );
       if (global.networkMgr.networks[i].chainType == 'EVM') {
         EVMChain.deployOmniverse(global.networkMgr.networks[i]);
       } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
@@ -69,10 +82,18 @@ class ContractsMgr {
             tokenInfo
           );
         }
+      } else if (global.global.networkMgr.networks[i].chainType == 'INK') {
+        let address = await InkChain.deployOmniverse(
+          global.networkMgr.networks[i],
+          contractType
+        );
+        global.networkMgr.networks[i].INKContract = address;
       }
     }
 
     this.afterDeploy(contractType);
+    console.log('All contracts information:', global.networkMgr.networks);
+    await utils.sleep(5);
   }
 }
 

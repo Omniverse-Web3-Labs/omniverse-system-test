@@ -14,6 +14,7 @@ module.exports = {
   },
 
   async mint(chainType, chainName, to, token, tokenId) {
+    let ret;
     if (chainType == 'EVM') {
       let subCommand = tokenId ? ' -ti ' + tokenId : '';
       let cmd =
@@ -31,7 +32,7 @@ module.exports = {
         ',' +
         token +
         subCommand;
-      execSync(cmd);
+      ret = execSync(cmd);
       await utils.sleep(2);
     } else if (chainType == 'SUBSTRATE') {
       let cmd =
@@ -50,12 +51,31 @@ module.exports = {
         to +
         ',' +
         token;
+      ret = execSync(cmd);
+      await utils.sleep(3);
+    } else if (chainType == 'INK') {
+      let cmd =
+        'cd ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        ' && node index.js -s 0';
       execSync(cmd);
+      cmd =
+        'cd ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        ' && node index.js -m ' +
+        chainName +
+        ',' +
+        to +
+        ',' +
+        token;
+      ret = execSync(cmd);
       await utils.sleep(3);
     }
+    console.log('mint', chainType, ret.toString());
   },
 
   async transfer(chainType, chainName, fromIndex, to, token, tokenId) {
+    let ret;
     if (chainType == 'EVM') {
       let subCommand = tokenId ? ' -ti ' + tokenId : '';
       let cmd =
@@ -74,7 +94,7 @@ module.exports = {
         ',' +
         token +
         subCommand;
-      execSync(cmd);
+      ret = execSync(cmd);
       await utils.sleep(2);
     } else if (chainType == 'SUBSTRATE') {
       let cmd =
@@ -94,9 +114,28 @@ module.exports = {
         to +
         ',' +
         token;
+      ret = execSync(cmd);
+      await utils.sleep(3);
+    } else if (chainType == 'INK') {
+      let cmd =
+        'cd ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        ' && node index.js -s ' +
+        fromIndex;
       execSync(cmd);
+      cmd =
+        'cd ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        ' && node index.js -t ' +
+        chainName +
+        ',' +
+        to +
+        ',' +
+        token;
+      ret = execSync(cmd);
       await utils.sleep(3);
     }
+    console.log('transfer', chainType, ret.toString());
   },
 
   balanceOf(chainType, chainName, account, tokenId) {
@@ -120,6 +159,15 @@ module.exports = {
         chainName +
         ',' +
         tokenId +
+        ',' +
+        account;
+      ret = execSync(cmd);
+    } else if (chainType == 'INK') {
+      let cmd =
+        'cd ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        ' && node index.js -o ' +
+        chainName +
         ',' +
         account;
       ret = execSync(cmd);

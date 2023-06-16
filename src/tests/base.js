@@ -10,49 +10,51 @@ module.exports = {
     },
 
     async mint(chainType, chainName, to, token) {
+        let ret;
         if (chainType == 'EVM') {
             let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -s 0';
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -m ' + chainName + ',' + to + ',' + token;
-            execSync(cmd);
+            ret = execSync(cmd);
             await utils.sleep(2);
         } else if (chainType == 'SUBSTRATE') {
             let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s 0';
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -m ' + chainName + ',' + to + ',' + token;
-            execSync(cmd);
+            ret = execSync(cmd);
             await utils.sleep(3);
         } else if (chainType == 'INK') {
             let cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -s 0';
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -m ' + chainName + ',' + to + ',' + token;
-            let ret = execSync(cmd);
-            console.log('mint', ret.toString());
+            ret = execSync(cmd);
             await utils.sleep(3);
         }
+        console.log('mint', chainType, ret.toString());
     },
 
     async transfer(chainType, chainName, fromIndex, to, token) {
+        let ret;
         if (chainType == 'EVM') {
             let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -s ' + fromIndex;
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/index.js -t ' + chainName + ',' + to + ',' + token;
-            execSync(cmd);
+            ret = execSync(cmd);
             await utils.sleep(2);
         } else if (chainType == 'SUBSTRATE') {
             let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s ' + fromIndex;
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -t ' + chainName + ',' + to + ',' + token;
-            execSync(cmd);
+            ret = execSync(cmd);
             await utils.sleep(3);
         } else if (chainType == 'INK') {
             let cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -s ' + fromIndex;
             execSync(cmd);
             cmd = 'cd ' + config.get('submodules.inkOmniverseToolPath') + ' && node index.js -t ' + chainName + ',' + to + ',' + token;
-            let ret = execSync(cmd);
-            console.log('transfer', ret.toString());
+            ret = execSync(cmd);
             await utils.sleep(3);
         }
+        console.log('transfer', chainType, ret.toString());
     },
 
     async balanceOf(chainType, chainName, account) {

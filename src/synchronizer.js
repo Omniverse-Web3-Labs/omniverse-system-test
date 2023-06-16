@@ -37,7 +37,6 @@ class Synchronizer {
                 item.omniverseContractAddress = global.networkMgr.networks[i].INKContract;
                 item.nodeAddress = network.ws;
                 item.omniverseChainId = network.omniverseChainId;
-                console.log(item);
             }
             cfg.networks[network.chainName] = item;
         }
@@ -59,12 +58,19 @@ class Synchronizer {
         fs.writeFileSync(config.get('submodules.synchronizerPath') + 'config/.secret', JSON.stringify(secretCfg, null, '\t'));
     }
 
-    prepare(contractType) {
+    async prepare(contractType) {
+        console.log(
+'///////////////////////////////////////////////////\n\
+//           Prepare for Synchronizer            //\n\
+///////////////////////////////////////////////////'
+        );
         this.updateConfig(contractType);
 
         this.updateRes();
 
         this.updateSecret();
+
+        await utils.sleep(5);
     }
 
     beforeLaunch() {

@@ -1,6 +1,7 @@
 const EVMChain = require('./EVMChain');
 const SustrateChain = require('./substrate');
 const InkChain = require('./ink');
+const utils = require('../utils/utils');
 
 class NodesMgr {
     constructor() {
@@ -15,7 +16,12 @@ class NodesMgr {
     /**
      * @method launch Launch nodes for testing
      */
-    launch() {
+    async launch() {
+        console.log(
+'///////////////////////////////////////////////////\n\
+//                 Luanch Nodes                  //\n\
+///////////////////////////////////////////////////'
+        );
         for (let i in global.networkMgr.networks) {
             if (global.networkMgr.networks[i].rpc) {
                 continue;
@@ -36,6 +42,8 @@ class NodesMgr {
             global.networkMgr.networks[i].port = this.port;
             this.nodesInfo[i] = this.port++;
         }
+        console.log('All nodes information:', global.networkMgr.networks);
+        await utils.sleep(5);
     }
 
     /**
@@ -44,7 +52,6 @@ class NodesMgr {
      * @return Port of the chain
      */
     launchChain(chainInfo) {
-        console.log('launchChain', chainInfo);
         if (chainInfo.chainType == 'EVM') {
             Childs.push(EVMChain.launch(this.port, chainInfo));
         } else if (chainInfo.chainType == 'SUBSTRATE') {

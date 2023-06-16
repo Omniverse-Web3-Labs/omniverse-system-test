@@ -10,7 +10,7 @@ const SubstrateChain = require('../contracts/substrate');
 
 class Test {
     async initialize() {
-        console.log('initialize', global.networkMgr.networks);
+        console.log('Initialize contracts');
         let allienceInfo = '';
         for (let i in global.networkMgr.networks) {
             let network = global.networkMgr.networks[i];
@@ -34,7 +34,7 @@ class Test {
         }
         let cmd;
         // Omniverse contracts
-        console.log('allienceInfo', allienceInfo);
+        console.log('Members', allienceInfo);
         for (let i in global.networkMgr.networks) {
             let network = global.networkMgr.networks[i];
             if (network.chainType == 'EVM') {
@@ -62,7 +62,7 @@ class Test {
     }
 
     updateToolConfig() {
-        console.log('updateToolConfig');
+        console.log('Test updateToolConfig');
         let cfg = {};
         for (let i in global.networkMgr.networks) {
             let item = {};
@@ -96,7 +96,6 @@ class Test {
     
     updateToolSecret() {
         console.log('Test updateToolSecret');
-        console.log('For EVM');
         let secretCfg = {};
         secretCfg.sks = accounts.getAll()[0];
         secretCfg.index = 0;
@@ -107,14 +106,18 @@ class Test {
     }
     
     updateToolRes() {
-        console.log('updateToolRes');
+        console.log('Test updateToolRes');
         execSync('cp ./res/ink/omniverse_protocol.contract ' + config.get('submodules.inkOmniverseToolPath') + 'res/INKContract.json');
         // execSync('cp ' + config.get('') + 'build/contracts/.json ' + config.get('') + 'res/');
         // execSync('cd ' + config.get('') + ' && echo -n ' + '' + ' > .secret');
     }
 
     async prepare() {
-        console.log('Test prepare');
+        console.log(
+'///////////////////////////////////////////////////\n\
+//             Prepare for Testing               //\n\
+///////////////////////////////////////////////////'
+        );
         this.updateToolConfig();
 
         this.updateToolSecret();
@@ -127,7 +130,11 @@ class Test {
     }
 
     async testRestore() {
-        console.log('testRestore');
+        console.log(
+'///////////////////////////////////////////////////\n\
+//               Test work Restore               //\n\
+///////////////////////////////////////////////////'
+        );
         let index = 1;
         for (let i in global.networkMgr.networks) {
             console.log(global.networkMgr.networks[i].chainType, index);
@@ -148,7 +155,11 @@ class Test {
     }
 
     async testFlow() {
-        console.log('testFlow');
+        console.log(
+'///////////////////////////////////////////////////\n\
+//                 Test Workflow                 //\n\
+///////////////////////////////////////////////////'
+        );
         let users = accounts.getUsers()[1];
         // Launch synchronizer
         await synchronizer.launch();

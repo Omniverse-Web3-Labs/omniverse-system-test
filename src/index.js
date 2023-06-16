@@ -9,6 +9,7 @@ const { execSync } = require("child_process");
 const synchronizer = require('./synchronizer');
 const { queue } = require('async');
 const { substrateTxWorker } = require('./utils/utils');
+const utils = require('./utils/utils');
 global.networkMgr = require('./utils/networkMgr');
 global.Childs = [];
 global.Queues = queue(substrateTxWorker, 1);
@@ -26,11 +27,18 @@ function install() {
 }
 
 async function init() {
+    console.log(
+'///////////////////////////////////////////////////\n\
+//                  Initialize                   //\n\
+///////////////////////////////////////////////////'
+        );
     accounts.init();
     global.networkMgr.init();
+    await utils.sleep(5);
 }
 
 async function deploy(contractType) {
+    contractType = 'ft';
     let tests;
     if (contractType == 'ft') {
         tests = ftTest;
@@ -45,12 +53,12 @@ async function deploy(contractType) {
     ////////////////////////////////////////////////////////
     //                  Initialize System                 //
     ////////////////////////////////////////////////////////
-    init();
+    await init();
 
     ////////////////////////////////////////////////////////
     //                     Launch Nodes                   //
     ////////////////////////////////////////////////////////
-    nodes.launch();
+    await nodes.launch();
 
     ////////////////////////////////////////////////////////
     //                  Deploy Contracts                  //
@@ -60,7 +68,7 @@ async function deploy(contractType) {
     ////////////////////////////////////////////////////////
     //                Prepare Synchronizer                //
     ////////////////////////////////////////////////////////
-    synchronizer.prepare(contractType);
+    await synchronizer.prepare(contractType);
 
     ////////////////////////////////////////////////////////
     //                  Initialize Tests                  //
@@ -71,6 +79,7 @@ async function deploy(contractType) {
 }
 
 async function test(contractType) {
+    contractType = 'ft';
     let tests;
     if (contractType == 'ft') {
         tests = ftTest;
@@ -95,18 +104,18 @@ async function test(contractType) {
     program
         .version('0.1.0')
         .option('-i, --install', 'Install environment')
-        .option('-t, --test <app name>', 'Test application')
-        .option('-d, --deploy <app name>', 'Deploy contracts')
+        .option('-t, --test', 'Test application')
+        .option('-d, --deploy', 'Deploy contracts')
         .parse(process.argv);
 
     if (program.opts().install) {
         install();
     }
     else if (program.opts().test) {
-        await test(program.opts().test);
+        await test();
     }
     else if (program.opts().deploy) {
-        await deploy(program.opts().deploy);
+        await deploy();
     }
 }());
 

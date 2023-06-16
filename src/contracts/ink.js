@@ -23,8 +23,6 @@ class InkDeployer {
   }
 
   async deployOmniverse(chainInfo, contractType) {
-    console.log('deployOmniverse', chainInfo);
-
     let keyring = new Keyring({ type: 'ecdsa' });
     let owner = keyring.addFromSeed(
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))
@@ -64,7 +62,6 @@ class InkDeployer {
   }
 
   async setMembers(contractType) {
-    console.log('Substrate set members');
     let keyring = new Keyring({ type: 'ecdsa' });
     let owner = keyring.addFromSeed(
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))

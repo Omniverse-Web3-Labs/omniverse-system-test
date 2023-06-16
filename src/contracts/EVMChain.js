@@ -16,7 +16,6 @@ class EVMChainDeployer {
     }
 
     updateConfig() {
-        console.log('EVMChainDeployer update Config');
         let cfg = {};
         let networks = global.networkMgr.getNetworksByType('EVM');
         for (let i in networks) {
@@ -31,20 +30,17 @@ class EVMChainDeployer {
     }
     
     updateMigrationScript() {
-        console.log('EVMChainDeployer updateMigrationScript');
         let str = '';
         let networks = global.networkMgr.getNetworksByType('EVM');
         for (let i in networks) {
             str += networks[i].chainName + ': ' + networks[i].omniverseChainId + ',\n';
         }
-        console.log('migrate networks', str);
         let migrationScript = fs.readFileSync('./res/2_deploy_contracts.js').toString();
         migrationScript = migrationScript.replace('CHAINS_ID_TEMPLATE', str);
         fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'migrations/2_deploy_contracts.js', migrationScript);
     }
     
     updateTruffleConfig() {
-        console.log('EVMChainDeployer updateTruffleConfig');
         let str = '';
         let netConfig = 'CHAIN_NAME:{\nprovider:()=>new HDWalletProvider(mnemonic, `CHAIN_RPC`),\nnetwork_id:"*"\n},\n';
         let networks = global.networkMgr.getNetworksByType('EVM');
@@ -52,20 +48,17 @@ class EVMChainDeployer {
             str += netConfig.replace('CHAIN_NAME', networks[i].chainName).
             replace('CHAIN_RPC', networks[i].rpc);
         }
-        console.log('truffle networks', str);
         let truffleConfigStr = fs.readFileSync('./res/config/truffle-config.js').toString();
         truffleConfigStr = truffleConfigStr.replace('NETWORK_TEMPLATE', str);
         fs.writeFileSync(config.get('submodules.omniverseContractPath') + 'truffle-config.js', truffleConfigStr);
     }
 
     async deployOmniverse(chainInfo) {
-        console.log('deployOmniverse', chainInfo);
         execSync("cd " + config.get('submodules.omniverseContractPath') + " && echo -n " + accounts.getOwner()[0].slice(2) + " > .secret");
 
         let cmd = "cd " + config.get('submodules.omniverseContractPath') + " && npx truffle migrate --network " + chainInfo.chainName + " --skip-dry-run";
         while (true) {
             try {
-                console.log('Execute deployment');
                 execSync(cmd).toString();
             }
             catch (e) {

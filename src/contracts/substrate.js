@@ -60,12 +60,12 @@ class SubstrateDeployer {
         let members = [];
         for (let j in global.networkMgr.networks) {
           let network = global.networkMgr.networks[j];
-          if (j != i) {
-            if (network.chainType == 'EVM') {
-              members.push([network.omniverseChainId, network.EVMContract]);
-            } else if (network.chainType == 'SUBSTRATE') {
-              members.push([omniverseChainId, network.tokenId]);
-            }
+          if (network.chainType == 'EVM') {
+            members.push([network.omniverseChainId, network.EVMContract]);
+          } else if (network.chainType == 'SUBSTRATE') {
+            members.push([network.omniverseChainId, network.tokenId]);
+          } else if (network.chainType == 'INK') {
+            members.push([network.omniverseChainId, network.tokenId]);
           }
         }
         if (contractType == 'ft') {

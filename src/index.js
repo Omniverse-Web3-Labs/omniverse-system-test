@@ -23,6 +23,8 @@ function install() {
     execSync(cmd);
     cmd = "cd " + config.get('submodules.substrateOmniverseToolPath') + " && npm install";
     execSync(cmd);
+    cmd = "cd " + config.get('submodules.swapServicePath') + " && cd .. && npm install";
+    execSync(cmd);
 }
 
 async function init() {
@@ -70,18 +72,25 @@ async function deploy(contractType, count) {
     ////////////////////////////////////////////////////////
     //                  Initialize Tests                  //
     ////////////////////////////////////////////////////////
-    await tests.prepare(count);
+    await tests.prepare();
 
     console.log('Deploy completed');
 }
 
 async function test(contractType, count) {
     let tests;
+    let doSwap;
     if (contractType == 'ft') {
         tests = ftTest;
     }
     else if (contractType == 'nft') {
         tests = nftTest;
+    }
+    else if (contractType == 'swap') {
+        contractType = 'ft';
+        tests = ftTest;
+        count = 2;
+        doSwap = true;
     }
     else {
         console.log('Contract type error');
@@ -96,7 +105,7 @@ async function test(contractType, count) {
     await database.launch(contractType);
 
     // Run test cases
-    await tests.runTest();
+    await tests.runTest(doSwap);
 
     console.log('Success');
     process.exit();

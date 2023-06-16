@@ -99,7 +99,7 @@ module.exports = {
     }
   },
 
-  async balanceOf(chainType, chainName, account, tokenId) {
+  balanceOf(chainType, chainName, account, tokenId) {
     let ret;
     if (chainType == 'EVM') {
       let subCommand = tokenId ? ' -ti ' + tokenId : '';
@@ -125,6 +125,128 @@ module.exports = {
       ret = execSync(cmd);
     }
     return ret;
+  },
+
+  swapBalanceOf(chainName, account, tokenId) {
+    let cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -bs ' +
+      chainName +
+      ',' +
+      tokenId +
+      ',' +
+      account;
+    return execSync(cmd);
+  },
+
+  swapDeposit(chainName, fromIndex, token, tokenId) {
+    let cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -s ' +
+      fromIndex;
+    execSync(cmd);
+    cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -d ' +
+      chainName +
+      ',' +
+      tokenId +
+      ',' +
+      token;
+    execSync(cmd);
+  },
+
+  addLiquidity(
+    chainName,
+    fromIndex,
+    tradingPairName,
+    tokenX,
+    tokenXAmount,
+    tokenY,
+    tokenYAmount
+  ) {
+    let cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -s ' +
+      fromIndex;
+    execSync(cmd);
+    cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -al ' +
+      chainName +
+      ',' +
+      tradingPairName +
+      ',' +
+      tokenX +
+      ',' +
+      tokenXAmount +
+      ',' +
+      tokenY +
+      ',' +
+      tokenYAmount;
+    execSync(cmd);
+  },
+
+  swapX2Y(chainName, fromIndex, tradingPairName, token) {
+    let cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -s ' +
+      fromIndex;
+    execSync(cmd);
+    cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -x2y ' +
+      chainName +
+      ',' +
+      tradingPairName +
+      ',' +
+      token;
+    execSync(cmd);
+  },
+
+  swapY2X(chainName, fromIndex, tradingPairName, token) {
+    let cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -s ' +
+      fromIndex;
+    execSync(cmd);
+    cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -y2x ' +
+      chainName +
+      ',' +
+      tradingPairName +
+      ',' +
+      token;
+    execSync(cmd);
+  },
+
+  withdraw(chainName, fromIndex, tokenId, token) {
+    let cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -s ' +
+      fromIndex;
+    execSync(cmd);
+    cmd =
+      'cd ' +
+      config.get('submodules.substrateOmniverseToolPath') +
+      ' && node index.js -w ' +
+      chainName +
+      ',' +
+      tokenId +
+      ',' +
+      token;
+    execSync(cmd);
   },
 
   async transferSubstrateNativeToken(network, users, porter) {

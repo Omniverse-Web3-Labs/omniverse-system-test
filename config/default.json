@@ -4,7 +4,8 @@
         "omniverseToolPath": "./submodules/omniverse-evm/contracts/",
         "synchronizerPath": "./submodules/omniverse-synchronizer/",
         "substrateOmniverseToolPath": "./submodules/omniverse-swap-tools/omniverse-helper/",
-        "databasePath": "./submodules/omniverse-database/"
+        "databasePath": "./submodules/omniverse-database/",
+        "swapServicePath": "./submodules/omniverse-service/swap/"
     },
     "tokenInfo": {
         "ft": [{

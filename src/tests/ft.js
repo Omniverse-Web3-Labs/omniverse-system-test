@@ -7,6 +7,7 @@ const assert = require('assert');
 const base = require('./base');
 const synchronizer = require("../synchronizer");
 const SubstrateChain = require('../contracts/substrate');
+const prompt = require('prompt-sync')();
 
 class Test {
     async initialize() {
@@ -154,7 +155,7 @@ class Test {
         }
     }
 
-    async testFlow() {
+    async testFlow(docker) {
         console.log(
 '///////////////////////////////////////////////////\n\
 //                 Test Workflow                 //\n\
@@ -162,7 +163,21 @@ class Test {
         );
         let users = accounts.getUsers()[1];
         // Launch synchronizer
-        await synchronizer.launch();
+        if (docker) {
+            while (true) {
+                const userInput = prompt('Have you launched the synchronizer(y)?');
+                if (userInput == 'y') {
+                    break;
+                }
+                else {
+                    console.log('Please input y');
+                    continue;
+                }
+            }
+        }
+        else {
+            await synchronizer.launch();
+        }
 
         // Mint token to user 1
         console.log('Mint token');
@@ -181,12 +196,12 @@ class Test {
         }
     }
 
-    async runTest() {
+    async runTest(docker) {
         console.log('runTests');
 
         // await this.testRestore();
 
-        await this.testFlow();
+        await this.testFlow(docker);
     }
 
     async beforeRestore(network, index) {

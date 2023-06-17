@@ -78,8 +78,8 @@ async function deploy(contractType) {
     console.log('Deploy completed');
 }
 
-async function test(contractType) {
-    contractType = 'ft';
+async function test(docker) {
+    let contractType = 'ft';
     let tests;
     if (contractType == 'ft') {
         tests = ftTest;
@@ -95,7 +95,7 @@ async function test(contractType) {
     await deploy(contractType);
 
     // Run test cases
-    await tests.runTest();
+    await tests.runTest(docker);
 
     console.log('Success');
 }
@@ -106,13 +106,14 @@ async function test(contractType) {
         .option('-i, --install', 'Install environment')
         .option('-t, --test', 'Test application')
         .option('-d, --deploy', 'Deploy contracts')
+        .option('--docker', 'User docker to launch synchronizer')
         .parse(process.argv);
 
     if (program.opts().install) {
         install();
     }
     else if (program.opts().test) {
-        await test();
+        await test(program.opts().docker);
     }
     else if (program.opts().deploy) {
         await deploy();

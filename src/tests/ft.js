@@ -9,6 +9,7 @@ const synchronizer = require('../synchronizer');
 const SubstrateChain = require('../contracts/substrate');
 const contractsMgr = require('../contracts');
 const SwapService = require('./swap');
+const prompt = require('prompt-sync')();
 
 class Test {
   async initialize() {
@@ -227,14 +228,28 @@ class Test {
     );
   }
 
-  async testFlow(doSwap) {
+  async testFlow(doSwap, docker) {
     console.log(
       '///////////////////////////////////////////////////\
       \n//                 Test Workflow                //\
       \n//////////////////////////////////////////////////'
     );
     // Launch synchronizer
-    await synchronizer.launch();
+    if (docker) {
+        while (true) {
+            const userInput = prompt('Have you launched the synchronizer(y)?');
+            if (userInput == 'y') {
+                break;
+            }
+            else {
+                console.log('Please input y');
+                continue;
+            }
+        }
+    }
+    else {
+        await synchronizer.launch();
+    }
     if (doSwap) {
       SwapService.prepare();
       await SwapService.launch();
@@ -395,12 +410,12 @@ class Test {
     assert(ret.includes(expect.toLocaleString()), 'swap balance not expect');
   }
 
-  async runTest(doSwap) {
+  async runTest(doSwap, docker) {
     console.log('runTests');
 
     // await this.testRestore();
 
-    await this.testFlow(doSwap);
+    await this.testFlow(doSwap, docker);
   }
 
   async beforeRestore(network, index) {

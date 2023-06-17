@@ -84,7 +84,7 @@ async function deploy(contractType, count) {
   console.log('Deploy completed');
 }
 
-async function test(contractType, count) {
+async function test(contractType, count, docker) {
   let tests;
   let doSwap;
   if (contractType == 'ft') {
@@ -104,7 +104,7 @@ async function test(contractType, count) {
   await deploy(contractType, count);
 
   // Run test cases
-  await tests.runTest(doSwap);
+  await tests.runTest(doSwap, docker);
 
   console.log('Test competed and success');
   console.log('To exit, press Ctrl+C');
@@ -117,6 +117,7 @@ async function test(contractType, count) {
     .option('-i, --install', 'Install environment')
     .option('-t, --test <app name>,', 'Test application')
     .option('-d, --deploy <app name>', 'Deploy contracts')
+    .option('--docker', 'User docker to launch synchronizer')
     .option('-c, --count <count>', 'The number of contracts to be deployed')
     .parse(process.argv);
 
@@ -124,7 +125,7 @@ async function test(contractType, count) {
   if (program.opts().install) {
     install();
   } else if (program.opts().test) {
-    await test(program.opts().test, count);
+    await test(program.opts().test, count, program.opts().docker);
   } else if (program.opts().deploy) {
     await deploy(program.opts().deploy, count);
   }

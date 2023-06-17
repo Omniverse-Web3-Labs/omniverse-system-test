@@ -8,7 +8,7 @@ class SubstrateDeployer {
   }
 
   beforeDeploy(contractType, count) {
-    let networks = global.networkMgr.getNetworksByType('SUBSTRATE');
+    let networks = NetworkMgr.getNetworksByType('SUBSTRATE');
     for (let i in networks) {
       let template = config.get('tokenInfo')[contractType];
       // console.log(template[0])
@@ -78,19 +78,19 @@ class SubstrateDeployer {
     let owner = keyring.addFromSeed(
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))
     );
-    for (let i in global.networkMgr.networks) {
-      if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-        let provider = new WsProvider(global.networkMgr.networks[i].ws);
+    for (let i in NetworkMgr.networks) {
+      if (NetworkMgr.networks[i].chainType == 'SUBSTRATE') {
+        let provider = new WsProvider(NetworkMgr.networks[i].ws);
         let api = await ApiPromise.create({
           provider,
           noInitWarn: true,
         });
         let members = [];
-        for (let j in global.networkMgr.networks) {
-          let network = global.networkMgr.networks[j];
+        for (let j in NetworkMgr.networks) {
+          let network = NetworkMgr.networks[j];
           if (j != i) {
             if (network.chainType == 'EVM') {
-              let member = network.EVMContract[tokenId];
+              let member = network.omniverseContractAddress[tokenId];
               members.push([network.omniverseChainId, member]);
             } else if (network.chainType == 'SUBSTRATE') {
               members.push([omniverseChainId, tokenId]);

@@ -106,7 +106,7 @@ async function test(contractType, count, docker) {
   // Run test cases
   await tests.runTest(doSwap, docker);
 
-  console.log('Test competed and success');
+  console.log('Test competed and successfull');
   console.log('To exit, press Ctrl+C');
   // process.exit();
 }
@@ -133,10 +133,6 @@ async function test(contractType, count, docker) {
 
 process.on('unhandledRejection', (err) => {
   console.log('UnhanledRejection', err);
-  process.kill(-process.pid);
-});
-
-process.on('exit', () => {
   process.kill(-process.pid);
 });
 

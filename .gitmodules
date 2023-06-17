@@ -1,15 +1,18 @@
 [submodule "submodules/omniverse-synchronizer"]
 	path = submodules/omniverse-synchronizer
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-synchronizer.git
+	branch = mileston-2
 [submodule "submodules/omniverse-evm"]
 	path = submodules/omniverse-evm
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-evm.git
+	branch = mileston-2
 [submodule "submodules/omniverse-database"]
 	path = submodules/omniverse-database
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-database.git
 [submodule "submodules/omniverse-swap-tools"]
 	path = submodules/omniverse-swap-tools
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-swap-tools.git
+	branch = mileston-2
 [submodule "submodules/omniverse-service"]
 	path = submodules/omniverse-service
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-service.git

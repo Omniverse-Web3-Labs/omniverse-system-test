@@ -16,18 +16,18 @@ class Database {
     this.port = cfg.port;
     cfg.networks = {};
 
-    for (let i in global.networkMgr.networks) {
-      let network = global.networkMgr.networks[i];
+    for (let i in NetworkMgr.networks) {
+      let network = NetworkMgr.networks[i];
       let item = JSON.parse(
         JSON.stringify(config.get(`database.networkTemp.${network.chainType}`))
       );
       item.nodeAddress = network.ws;
       item.omniverseChainId = network.omniverseChainId;
       if (network.chainType == 'EVM') {
-        item.chainId = global.networkMgr.networks[i].chainId;
-        item.omniverseContractAddress = network.EVMContract;
+        item.chainId = NetworkMgr.networks[i].chainId;
+        item.omniverseContractAddress = network.omniverseContractAddress;
       } else if (network.chainType == 'SUBSTRATE') {
-        item.tokenId = global.networkMgr.networks[i].tokenId;
+        item.tokenId = NetworkMgr.networks[i].tokenId;
         if (contractType == 'ft') {
           item.pallets = ['assets'];
         } else {

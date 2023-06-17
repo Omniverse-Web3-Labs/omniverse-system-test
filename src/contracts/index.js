@@ -13,6 +13,7 @@ class ContractsMgr {
   beforeDeploy(contractType, count) {
     EVMChain.beforeDeploy(contractType, count);
     SubstrateChain.beforeDeploy(contractType, count);
+    InkChain.beforeDeploy(contractType, count);
   }
 
   async afterDeploy(contractType) {
@@ -23,14 +24,14 @@ class ContractsMgr {
         )
         .toString()
     );
-    for (let i in global.networkMgr.networks) {
-      let network = global.networkMgr.networks[i];
+    for (let i in NetworkMgr.networks) {
+      let network = NetworkMgr.networks[i];
       if (network.chainType == 'EVM') {
         if (contractType == 'ft') {
-          network.EVMContract =
+          network.omniverseContractAddress =
             omniverseCfg[network.chainName].skywalkerFungibleAddress;
         } else {
-          network.EVMContract =
+          network.omniverseContractAddress =
             omniverseCfg[network.chainName].skywalkerNonFungibleAddress;
         }
       }
@@ -52,47 +53,49 @@ class ContractsMgr {
 
   async deploy(contractType, count) {
     console.log(
-      '///////////////////////////////////////////////////\n\
-      //               Deploy Contracts                //\n\
-      ///////////////////////////////////////////////////'
+      '///////////////////////////////////////////////////\
+      \n//               Deploy Contracts               //\
+      \n//////////////////////////////////////////////////'
     );
     this.beforeDeploy(contractType, count);
 
-    for (let i in global.networkMgr.networks) {
-      console.log(
-        'Deploy',
-        global.networkMgr.networks[i].chainName,
-        global.networkMgr.networks[i].chainType
-      );
-      if (global.networkMgr.networks[i].chainType == 'EVM') {
-        EVMChain.deployOmniverse(global.networkMgr.networks[i]);
-      } else if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
+    for (let i in NetworkMgr.networks) {
+      let network = NetworkMgr.networks[i];
+      console.log('Deploy', network.chainName, network.chainType);
+      if (network.chainType == 'EVM') {
+        EVMChain.deployOmniverse(network);
+      } else if (network.chainType == 'SUBSTRATE') {
         if (contractType == 'ft') {
-          networkMgr.networks[i].pallet = ['assets'];
+          network.pallet = ['assets'];
         } else if (contractType == 'nft') {
-          networkMgr.networks[i].pallet = ['uniques'];
+          network.pallet = ['uniques'];
         }
-        networkMgr.networks[i].tokenId = [];
+        network.tokenId = [];
         for (let tokenInfo of SubstrateChain.tokenInfo[i]) {
-          networkMgr.networks[i].tokenId.push(tokenInfo.name);
+          network.tokenId.push(tokenInfo.name);
           this.tokenId.push(tokenInfo.name);
           await SubstrateChain.deployOmniverse(
-            networkMgr.networks[i],
+            network,
             contractType,
             tokenInfo
           );
         }
-      } else if (global.global.networkMgr.networks[i].chainType == 'INK') {
-        let address = await InkChain.deployOmniverse(
-          global.networkMgr.networks[i],
-          contractType
-        );
-        global.networkMgr.networks[i].INKContract = address;
+      } else if (network.chainType == 'INK') {
+        network.omniverseContractAddress = {};
+        for (let tokenInfo of InkChain.tokenInfo[i]) {
+          let address = await InkChain.deployOmniverse(
+            network,
+            contractType,
+            tokenInfo
+          );
+          network.omniverseContractAddress[tokenInfo.name] = address;
+        }
       }
+      NetworkMgr.networks[i] = network;
     }
 
     this.afterDeploy(contractType);
-    console.log('All contracts information:', global.networkMgr.networks);
+    console.log('All contracts information:', NetworkMgr.networks);
     await utils.sleep(5);
   }
 }

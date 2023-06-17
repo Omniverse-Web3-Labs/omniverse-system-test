@@ -18,7 +18,7 @@ class EVMChainDeployer {
     updateConfig(contractType, count) {
         console.log('EVMChainDeployer update Config');
         let cfg = {};
-        let networks = global.networkMgr.getNetworksByType('EVM');
+        let networks = NetworkMgr.getNetworksByType('EVM');
         for (let i in networks) {
             let template = config.get('tokenInfo')[contractType];
             let contract = { tokenInfo: [{...template[0] }] };
@@ -52,7 +52,7 @@ class EVMChainDeployer {
     updateTruffleConfig() {
         let str = '';
         let netConfig = 'CHAIN_NAME:{\nprovider:()=>new HDWalletProvider(mnemonic, `CHAIN_RPC`),\nnetwork_id:"*"\n},\n';
-        let networks = global.networkMgr.getNetworksByType('EVM');
+        let networks = NetworkMgr.getNetworksByType('EVM');
         for (let i in networks) {
             str += netConfig.replace('CHAIN_NAME', networks[i].chainName).
             replace('CHAIN_RPC', networks[i].rpc);

@@ -54,6 +54,7 @@ module.exports = {
       ret = execSync(cmd);
       await utils.sleep(3);
     } else if (chainType == 'INK') {
+      let subCommand = tokenId ? ' -ti ' + tokenId : '';
       let cmd =
         'cd ' +
         config.get('submodules.inkOmniverseToolPath') +
@@ -67,7 +68,8 @@ module.exports = {
         ',' +
         to +
         ',' +
-        token;
+        token +
+        subCommand;
       ret = execSync(cmd);
       await utils.sleep(3);
     }
@@ -117,6 +119,7 @@ module.exports = {
       ret = execSync(cmd);
       await utils.sleep(3);
     } else if (chainType == 'INK') {
+      let subCommand = tokenId ? ' -ti ' + tokenId : '';
       let cmd =
         'cd ' +
         config.get('submodules.inkOmniverseToolPath') +
@@ -131,7 +134,8 @@ module.exports = {
         ',' +
         to +
         ',' +
-        token;
+        token + 
+        subCommand;
       ret = execSync(cmd);
       await utils.sleep(3);
     }
@@ -163,13 +167,15 @@ module.exports = {
         account;
       ret = execSync(cmd);
     } else if (chainType == 'INK') {
+      let subCommand = tokenId ? ' -ti ' + tokenId : '';
       let cmd =
         'cd ' +
         config.get('submodules.inkOmniverseToolPath') +
         ' && node index.js -o ' +
         chainName +
         ',' +
-        account;
+        account +
+        subCommand;
       ret = execSync(cmd);
     }
     return ret;

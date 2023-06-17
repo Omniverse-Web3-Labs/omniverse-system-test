@@ -8,9 +8,9 @@ class SwapService {
     updateToolConfig() {
         console.log('update swap service config');
         let cfg = {};
-        for (let i in global.networkMgr.networks) {
+        for (let i in NetworkMgr.networks) {
             let item = {};
-            let network = global.networkMgr.networks[i];
+            let network = NetworkMgr.networks[i];
             if (network.chainType == 'SUBSTRATE') {
                 item.nodeAddress = network.rpc;
                 item.tokenId = network.tokenId;

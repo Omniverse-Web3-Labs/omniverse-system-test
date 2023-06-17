@@ -5,7 +5,8 @@
         "synchronizerPath": "./submodules/omniverse-synchronizer/",
         "substrateOmniverseToolPath": "./submodules/omniverse-swap-tools/omniverse-helper/",
         "databasePath": "./submodules/omniverse-database/",
-        "swapServicePath": "./submodules/omniverse-service/swap/"
+        "swapServicePath": "./submodules/omniverse-service/swap/",
+        "inkOmniverseToolPath": "./submodules/omniverse-swap-tools/tool-for-ink/"
     },
     "tokenInfo": {
         "ft": [{

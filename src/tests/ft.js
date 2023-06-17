@@ -12,23 +12,26 @@ const SwapService = require('./swap');
 
 class Test {
   async initialize() {
-    console.log('initialize', global.networkMgr.networks);
+    console.log('initialize', NetworkMgr.networks);
     for (let tokenId of contractsMgr.tokenId) {
       console.log('tokenId', tokenId);
       let allienceInfo = '';
-      for (let i in global.networkMgr.networks) {
-        let network = global.networkMgr.networks[i];
+      for (let i in NetworkMgr.networks) {
+        let network = NetworkMgr.networks[i];
         let item = '';
         if (network.chainType == 'EVM') {
-          let name = network.EVMContract[tokenId];
+          let name = network.omniverseContractAddress[tokenId];
           item = '"' + network.omniverseChainId + '|' + name + '"';
         } else if (network.chainType == 'SUBSTRATE') {
           let name = '0x' + Buffer.from(tokenId).toString('hex');
           item = '"' + network.omniverseChainId + '|' + name + '"';
         } else if (network.chainType == 'INK') {
-          let tokenId =
-            '0x' + Buffer.from(network.INKContract[tokenId]).toString('hex');
-          item = '"' + network.omniverseChainId + '|' + tokenId + '"';
+          let name =
+            '0x' +
+            Buffer.from(network.omniverseContractAddress[tokenId]).toString(
+              'hex'
+            );
+          item = '"' + network.omniverseChainId + '|' + name + '"';
         }
 
         if (allienceInfo == '') {
@@ -40,8 +43,8 @@ class Test {
       let cmd;
       // Omniverse contracts
       console.log('allienceInfo', allienceInfo);
-      for (let i in global.networkMgr.networks) {
-        let network = global.networkMgr.networks[i];
+      for (let i in NetworkMgr.networks) {
+        let network = NetworkMgr.networks[i];
         if (network.chainType == 'EVM') {
           let subCommand = ' -ti ' + tokenId;
           cmd =
@@ -73,16 +76,16 @@ class Test {
     let mpc = accounts.getMpc()[1];
     users.push(mpc);
     console.log('Waiting for transfering substrate native token');
-    for (let i in networkMgr.networks) {
-      if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+    for (let i in NetworkMgr.networks) {
+      if (NetworkMgr.networks[i].chainType == 'SUBSTRATE') {
         await base.transferSubstrateNativeToken(
-          networkMgr.networks[i],
+          NetworkMgr.networks[i],
           users,
           accounts.getPorters()[0]
         );
-      } else if (networkMgr.networks[i].chainType == 'INK') {
+      } else if (NetworkMgr.networks[i].chainType == 'INK') {
         await base.transferSubstrateNativeToken(
-          networkMgr.networks[i],
+          NetworkMgr.networks[i],
           users,
           accounts.getPorters()[0]
         );
@@ -93,9 +96,9 @@ class Test {
   updateToolConfig() {
     console.log('Test updateToolConfig');
     let cfg = {};
-    for (let i in global.networkMgr.networks) {
+    for (let i in NetworkMgr.networks) {
       let item = {};
-      let network = global.networkMgr.networks[i];
+      let network = NetworkMgr.networks[i];
       if (network.chainType == 'SUBSTRATE') {
         item.nodeAddress = network.rpc;
         item.tokenId = network.tokenId;
@@ -107,7 +110,7 @@ class Test {
         item.nodeAddress = network.rpc;
         item.coolingDown = network.coolingDown;
         item.omniverseChainId = network.omniverseChainId;
-        item.omniverseContractAddress = network.INKContract;
+        item.omniverseContractAddress = network.omniverseContractAddress;
         item.metadataPath = './res/INKContract.json';
         cfg[network.chainType]
           ? (cfg[network.chainType][network.chainName] = item)
@@ -151,7 +154,10 @@ class Test {
   updateToolRes() {
     console.log('Test updateToolRes');
     execSync(
-      'cp ./res/ink/omniverse_protocol.contract ' +
+      'mkdir -p ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        'res' +
+        ' && cp ./res/ink/omniverse_protocol.contract ' +
         config.get('submodules.inkOmniverseToolPath') +
         'res/INKContract.json'
     );
@@ -161,9 +167,9 @@ class Test {
 
   async prepare() {
     console.log(
-      '///////////////////////////////////////////////////\n\
-//             Prepare for Testing               //\n\
-///////////////////////////////////////////////////'
+      '///////////////////////////////////////////////////\
+      \n//             Prepare for Testing              //\
+      \n///////////////////////////////////////////////////'
     );
     this.updateToolConfig();
 
@@ -178,21 +184,21 @@ class Test {
 
   async testRestore() {
     console.log(
-      '///////////////////////////////////////////////////\n\
-//               Test work Restore               //\n\
-///////////////////////////////////////////////////'
+      '////////////////////////////////////////////////////\
+      \n//               Test work Restore               //\
+      \n///////////////////////////////////////////////////'
     );
     let index = 1;
-    for (let i in global.networkMgr.networks) {
-      console.log(global.networkMgr.networks[i].chainType, index);
+    for (let i in NetworkMgr.networks) {
+      console.log(NetworkMgr.networks[i].chainType, index);
       // Prepare for testing work restore
-      await this.beforeRestore(global.networkMgr.networks[i], index);
+      await this.beforeRestore(NetworkMgr.networks[i], index);
 
       // Launch synchronizer
       await synchronizer.launch();
 
       // Test work restore
-      await this.afterRestore(global.networkMgr.networks[i], index);
+      await this.afterRestore(NetworkMgr.networks[i], index);
 
       // Shut down synchronizer
       synchronizer.shutdown();
@@ -215,13 +221,17 @@ class Test {
       config.get('submodules.substrateOmniverseToolPath') + '.secret',
       JSON.stringify(secretCfg, null, '\t')
     );
+    fs.writeFileSync(
+      config.get('submodules.inkOmniverseToolPath') + '.secret',
+      JSON.stringify(secretCfg, null, '\t')
+    );
   }
 
   async testFlow(doSwap) {
     console.log(
-      '///////////////////////////////////////////////////\n\
-//                 Test Workflow                 //\n\
-///////////////////////////////////////////////////'
+      '///////////////////////////////////////////////////\
+      \n//                 Test Workflow                //\
+      \n//////////////////////////////////////////////////'
     );
     // Launch synchronizer
     await synchronizer.launch();
@@ -236,12 +246,12 @@ class Test {
     // Mint token to user 1
     console.log('Mint token');
     let index = 1;
-    for (let i in global.networkMgr.networks) {
-      let network = global.networkMgr.networks[i];
+    for (let i in NetworkMgr.networks) {
+      let network = NetworkMgr.networks[i];
       console.log(i, network.chainType);
       let tokenIds =
-        network.chainType == 'EVM'
-          ? Object.keys(network.EVMContract)
+        network.chainType != 'SUBSTRATE'
+          ? Object.keys(network.omniverseContractAddress)
           : network.tokenId;
       for (let tokenId of tokenIds) {
         await base.mint(
@@ -275,16 +285,14 @@ class Test {
   }
 
   async doSwapTest() {
-    let networks = networkMgr.getNetworksByType('SUBSTRATE');
+    let networks = NetworkMgr.getNetworksByType('SUBSTRATE');
     let user = accounts.getUsers()[1][1];
     let userIndex = 4;
     for (let chainName in networks) {
       let network = networks[chainName];
       let tokenX = network.tokenId[0];
       let mintAmount = 10001000000;
-      let tokenXAmount = 10100000;
       let tokenY = network.tokenId[1];
-      let tokenYAmount = 1010000000;
       let tradingPairName = tokenX + '/' + tokenY;
       // mint tokenX
       await base.mint(
@@ -400,7 +408,7 @@ class Test {
     let users = accounts.getUsers()[1];
     let tokenIds =
       network.chainType == 'EVM'
-        ? Object.keys(network.EVMContract)
+        ? Object.keys(network.omniverseContractAddress)
         : network.tokenId;
     console.log(tokenIds);
     for (let tokenId of tokenIds) {
@@ -428,8 +436,8 @@ class Test {
     await utils.sleep(5);
     let users = accounts.getUsers()[1];
     let tokenIds =
-      typeof network.EVMContract == 'object'
-        ? Object.keys(network.EVMContract)
+      typeof network.omniverseContractAddress == 'object'
+        ? Object.keys(network.omniverseContractAddress)
         : network.tokenId;
     for (let tokenId of tokenIds) {
       let ret = base.balanceOf(

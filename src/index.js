@@ -10,7 +10,7 @@ const synchronizer = require('./synchronizer');
 const { queue } = require('async');
 const { substrateTxWorker } = require('./utils/utils');
 const utils = require('./utils/utils');
-global.networkMgr = require('./utils/networkMgr');
+global.NetworkMgr = require('./utils/networkMgr');
 global.Queues = queue(substrateTxWorker, 1);
 
 function install() {
@@ -37,12 +37,12 @@ function install() {
 
 async function init() {
   console.log(
-    '///////////////////////////////////////////////////\n\
-//                  Initialize                   //\n\
-///////////////////////////////////////////////////'
+    '///////////////////////////////////////////////////\
+    \n//                  Initialize                  //\
+    \n//////////////////////////////////////////////////'
   );
   accounts.init();
-  global.networkMgr.init();
+  NetworkMgr.init();
   await utils.sleep(5);
 }
 
@@ -64,7 +64,7 @@ async function deploy(contractType, count) {
   ////////////////////////////////////////////////////////
   //                     Launch Nodes                   //
   ////////////////////////////////////////////////////////
-  await nodes.launch();
+  nodes.launch();
 
   ////////////////////////////////////////////////////////
   //                  Deploy Contracts                  //
@@ -85,7 +85,6 @@ async function deploy(contractType, count) {
 }
 
 async function test(contractType, count) {
-  contractType = 'ft';
   let tests;
   let doSwap;
   if (contractType == 'ft') {
@@ -107,8 +106,9 @@ async function test(contractType, count) {
   // Run test cases
   await tests.runTest(doSwap);
 
-  console.log('Success');
-  process.exit();
+  console.log('Test competed and success');
+  console.log('To exit, press Ctrl+C');
+  // process.exit();
 }
 
 (async function () {

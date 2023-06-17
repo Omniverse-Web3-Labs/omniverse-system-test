@@ -22,16 +22,16 @@ function checkOwner(value, chainType, pk) {
 
 class Test {
   async initialize() {
-    console.log('initialize', global.networkMgr.networks);
+    console.log('initialize', NetworkMgr.networks);
 
     for (let tokenId of contractsMgr.tokenId) {
       console.log('tokenId', tokenId);
       let allienceInfo = '';
-      for (let i in global.networkMgr.networks) {
-        let network = global.networkMgr.networks[i];
+      for (let i in NetworkMgr.networks) {
+        let network = NetworkMgr.networks[i];
         let item = '';
         if (network.chainType == 'EVM') {
-          let name = network.EVMContract[tokenId];
+          let name = network.omniverseContractAddress[tokenId];
           item = '"' + network.omniverseChainId + '|' + name + '"';
         } else if (network.chainType == 'SUBSTRATE') {
           let name = '0x' + Buffer.from(tokenId).toString('hex');
@@ -47,8 +47,8 @@ class Test {
       let cmd;
       // Omniverse contracts
       console.log('allienceInfo', allienceInfo);
-      for (let i in global.networkMgr.networks) {
-        let network = global.networkMgr.networks[i];
+      for (let i in NetworkMgr.networks) {
+        let network = NetworkMgr.networks[i];
         if (network.chainType == 'EVM') {
           let subCommand = ' -ti ' + tokenId;
           cmd =
@@ -67,10 +67,10 @@ class Test {
 
     let users = accounts.getUsers()[1];
     console.log('Waiting for transfering substrate native token');
-    for (let i in networkMgr.networks) {
-      if (networkMgr.networks[i].chainType == 'SUBSTRATE') {
+    for (let i in NetworkMgr.networks) {
+      if (NetworkMgr.networks[i].chainType == 'SUBSTRATE') {
         await base.transferSubstrateNativeToken(
-          networkMgr.networks[i],
+          NetworkMgr.networks[i],
           users,
           accounts.getPorters()[0]
         );
@@ -81,8 +81,8 @@ class Test {
   updateToolConfig() {
     console.log('updateToolConfig');
     let cfg = {};
-    for (let i in global.networkMgr.networks) {
-      let network = global.networkMgr.networks[i];
+    for (let i in NetworkMgr.networks) {
+      let network = NetworkMgr.networks[i];
       let item = {};
       if (network.chainType == 'SUBSTRATE') {
         item.nodeAddress = network.rpc;
@@ -136,15 +136,15 @@ class Test {
   async testRestore() {
     console.log('testRestore');
     let index = 1;
-    for (let i in global.networkMgr.networks) {
+    for (let i in NetworkMgr.networks) {
       // Prepare for testing work restore
-      await this.beforeRestore(global.networkMgr.networks[i], index);
+      await this.beforeRestore(NetworkMgr.networks[i], index);
 
       // Launch synchronizer
       await synchronizer.launch();
 
       // Test work restore
-      await this.afterRestore(global.networkMgr.networks[i], index);
+      await this.afterRestore(NetworkMgr.networks[i], index);
       console.log('111 3');
       // Shut down synchronizer
       synchronizer.shutdown();
@@ -162,15 +162,15 @@ class Test {
     // Mint token to user 1
     console.log('Mint token');
     let index = 1;
-    for (let i in global.networkMgr.networks) {
-      let network = global.networkMgr.networks[i];
+    for (let i in NetworkMgr.networks) {
+      let network = NetworkMgr.networks[i];
       
     //   if (network.chainType == 'SUBSTRATE') {
     //     continue;
     //   } 
       let tokenIds =
-        network.chainType == 'EVM'
-          ? Object.keys(network.EVMContract)
+        network.chainType != 'SUBSTRATE'
+          ? Object.keys(network.omniverseContractAddress)
           : network.tokenId;
         for (let tokenId of tokenIds) {
         await base.mint(

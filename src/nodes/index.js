@@ -1,7 +1,7 @@
 const EVMChain = require('./EVMChain');
 const SustrateChain = require('./substrate');
 const InkChain = require('./ink');
-const utils = require('../utils/utils');
+const { execSync } = require('child_process');
 
 class NodesMgr {
   constructor() {
@@ -17,29 +17,29 @@ class NodesMgr {
    */
   launch() {
     console.log(
-'///////////////////////////////////////////////////\n\
-//                 Luanch Nodes                  //\n\
-///////////////////////////////////////////////////'
+      '///////////////////////////////////////////////////\
+      \n//                 Luanch Nodes                  //\
+      \n///////////////////////////////////////////////////'
     );
-    for (let i in global.networkMgr.networks) {
-      if (global.networkMgr.networks[i].rpc) {
+    for (let i in NetworkMgr.networks) {
+      if (NetworkMgr.networks[i].rpc) {
         continue;
       }
-      this.launchChain(global.networkMgr.networks[i]);
-      if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-        global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
-        global.networkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
-      } else if (global.networkMgr.networks[i].chainType == 'EVM') {
-        global.networkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
-        global.networkMgr.networks[i].ws = 'http://127.0.0.1:' + this.port;
-      } else if (global.networkMgr.networks[i].chainType == 'INK') {
-        global.networkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
-        global.networkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
+      this.launchChain(NetworkMgr.networks[i]);
+      if (NetworkMgr.networks[i].chainType == 'SUBSTRATE') {
+        NetworkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
+        NetworkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
+      } else if (NetworkMgr.networks[i].chainType == 'EVM') {
+        NetworkMgr.networks[i].rpc = 'http://127.0.0.1:' + this.port;
+        NetworkMgr.networks[i].ws = 'http://127.0.0.1:' + this.port;
+      } else if (NetworkMgr.networks[i].chainType == 'INK') {
+        NetworkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
+        NetworkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
       }
-      global.networkMgr.networks[i].port = this.port;
+      NetworkMgr.networks[i].port = this.port;
       this.nodesInfo[i] = this.port++;
     }
-    console.log('All nodes information:', global.networkMgr.networks);
+    console.log('All nodes information:', NetworkMgr.networks);
   }
 
   /**

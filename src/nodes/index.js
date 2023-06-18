@@ -25,6 +25,7 @@ class NodesMgr {
       if (NetworkMgr.networks[i].rpc) {
         continue;
       }
+      this.download(NetworkMgr.networks[i]);
       this.launchChain(NetworkMgr.networks[i]);
       if (NetworkMgr.networks[i].chainType == 'SUBSTRATE') {
         NetworkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
@@ -55,6 +56,60 @@ class NodesMgr {
       SustrateChain.launch(this.port, chainInfo);
     } else if (chainInfo.chainType == 'INK') {
       InkChain.launch(this.port, chainInfo);
+    }
+  }
+
+  download(chainInfo) {
+    if (chainInfo.chainType == 'SUBSTRATE') {
+      let tar =
+        process.platform == 'linux'
+          ? 'node-template.tar.gz'
+          : 'node-template-mac.tar.gz';
+      let binPath = process.cwd() + '/bin/';
+      let bin = binPath + 'node-template';
+      let cmd =
+        'mkdir -p ' +
+        binPath +
+        ' && cd ' +
+        binPath +
+        ' && curl -JLO ' +
+        'https://github.com/Omniverse-Web3-Labs/omniverse-swap/releases/download/w3f-m2/' +
+        tar;
+      if (!fs.existsSync(bin)) {
+        if (!fs.existsSync(binPath + tar)) {
+          execSync(cmd);
+        }
+        cmd = 'cd ' + binPath + ' && tar -xzvf ' + tar;
+        execSync(cmd);
+      }
+    } else if (chainInfo.chainType == 'INK') {
+      let tar =
+        process.platform == 'linux'
+          ? 'substrate-contracts-node-linux.tar.gz'
+          : 'substrate-contracts-node-mac-universal.tar.gz';
+      let binPath = process.cwd() + '/bin/';
+      let bin =
+        process.platform == 'linux'
+          ? binPath +
+            'artifacts/substrate-contract-node-linux/substrate-contract-node'
+          : binPath +
+            'artifacts/substrate-contracts-node-mac/substrate-contract-node';
+
+      let cmd =
+        'mkdir -p ' +
+        binPath +
+        ' && cd ' +
+        binPath +
+        ' && curl -JLO ' +
+        'https://github.com/paritytech/substrate-contracts-node/releases/download/v0.25.1/' +
+        tar;
+      if (!fs.existsSync(bin)) {
+        if (!fs.existsSync(binPath + tar)) {
+          execSync(cmd);
+        }
+        cmd = 'cd ' + binPath + ' && tar -xzvf ' + tar;
+        execSync(cmd);
+      }
     }
   }
 

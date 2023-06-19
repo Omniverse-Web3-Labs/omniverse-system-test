@@ -195,6 +195,7 @@ module.exports = {
   },
 
   swapDeposit(chainName, fromIndex, token, tokenId) {
+    console.log('Deposit', tokenId, token);
     let cmd =
       'cd ' +
       config.get('submodules.substrateOmniverseToolPath') +
@@ -222,6 +223,10 @@ module.exports = {
     tokenY,
     tokenYAmount
   ) {
+    console.log('Add liquidity', tokenX,
+    tokenXAmount,
+    tokenY,
+    tokenYAmount);
     let cmd =
       'cd ' +
       config.get('submodules.substrateOmniverseToolPath') +
@@ -247,6 +252,7 @@ module.exports = {
   },
 
   swapX2Y(chainName, fromIndex, tradingPairName, token) {
+    console.log('swap x to y', tradingPairName, token);
     let cmd =
       'cd ' +
       config.get('submodules.substrateOmniverseToolPath') +
@@ -266,6 +272,7 @@ module.exports = {
   },
 
   swapY2X(chainName, fromIndex, tradingPairName, token) {
+    console.log('swap y to x', tradingPairName, token);
     let cmd =
       'cd ' +
       config.get('submodules.substrateOmniverseToolPath') +
@@ -285,6 +292,7 @@ module.exports = {
   },
 
   withdraw(chainName, fromIndex, tokenId, token) {
+    console.log('Withdraw', tokenId, token);
     let cmd =
       'cd ' +
       config.get('submodules.substrateOmniverseToolPath') +

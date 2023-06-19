@@ -13,7 +13,6 @@ const prompt = require('prompt-sync')();
 
 class Test {
   async initialize() {
-    console.log('initialize', NetworkMgr.networks);
     for (let tokenId of contractsMgr.tokenId) {
       console.log('tokenId', tokenId);
       let allienceInfo = '';
@@ -210,7 +209,6 @@ class Test {
 
   updateToolSecret() {
     console.log('Test updateToolSecret');
-    console.log('For EVM');
     let secretCfg = {};
     secretCfg.sks = accounts.getAll()[0];
     secretCfg.index = 0;

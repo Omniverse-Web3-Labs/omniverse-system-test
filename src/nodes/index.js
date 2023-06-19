@@ -18,7 +18,7 @@ class NodesMgr {
   launch() {
     console.log(
       '///////////////////////////////////////////////////\
-      \n//                 Luanch Nodes                  //\
+      \n//                 Launch Nodes                  //\
       \n///////////////////////////////////////////////////'
     );
     for (let i in NetworkMgr.networks) {

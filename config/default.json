@@ -12,10 +12,6 @@
         "ft": [{
             "name": "SKYWALKER",
             "symbol": "SKYWALKER"
-        }],
-        "nft": [{
-            "name": "SKYWALKERNFT",
-            "symbol": "SKYWALKERNFT"
         }]
     },
     "networks": [

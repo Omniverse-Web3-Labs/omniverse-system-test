@@ -16,23 +16,23 @@
     },
     "networks": [
         {
-            "rpc": "",
-            "ws": "",
+            "rpc": "http://127.0.0.1:10100",
+            "ws": "http://127.0.0.1:10100",
             "chainType": "EVM",
             "omniverseChainId": "3",
             "chainId": 0,
             "coolingDown": 1
         },
         {
-            "rpc": "",
-            "ws": "",
+            "rpc": "ws://127.0.0.1:10101",
+            "ws": "ws://127.0.0.1:10101",
             "chainType": "SUBSTRATE",
             "omniverseChainId": "4",
             "coolingDown": 1
         },
         {
-            "rpc": "",
-            "ws": "",
+            "rpc": "ws://127.0.0.1:10102",
+            "ws": "ws://127.0.0.1:10102",
             "chainType": "INK",
             "omniverseChainId": "7",
             "coolingDown": 0

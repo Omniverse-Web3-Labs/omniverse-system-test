@@ -234,19 +234,17 @@ class Test {
     );
     // Launch synchronizer
     if (docker) {
-        while (true) {
-            const userInput = prompt('Have you launched the synchronizer(y)?');
-            if (userInput == 'y') {
-                break;
-            }
-            else {
-                console.log('Please input y');
-                continue;
-            }
+      while (true) {
+        const userInput = prompt('Have you launched the synchronizer(y)?');
+        if (userInput == 'y') {
+          break;
+        } else {
+          console.log('Please input y');
+          continue;
         }
-    }
-    else {
-        await synchronizer.launch();
+      }
+    } else {
+      await synchronizer.launch();
     }
     if (doSwap) {
       SwapService.prepare();
@@ -292,7 +290,12 @@ class Test {
         // );
         // console.log('ret', ret.toString());
         console.log('user1:');
-        this.getAllBalance(NetworkMgr.networks, users[1], tokenId, (100 - 11) * index);
+        this.getAllBalance(
+          NetworkMgr.networks,
+          users[1],
+          tokenId,
+          (100 - 11) * index
+        );
         console.log('user2:');
         this.getAllBalance(NetworkMgr.networks, users[2], tokenId, 11 * index);
       }
@@ -328,15 +331,16 @@ class Test {
         mintAmount,
         tokenY
       );
-      console.log('user:');
-      this.getAllBalance(NetworkMgr.networks, users[1], tokenId, mintAmount);
 
       await utils.sleep(10);
+      console.log('user:');
+      this.getAllBalance(NetworkMgr.networks, user, tokenX, mintAmount);
+      this.getAllBalance(NetworkMgr.networks, user, tokenY, mintAmount);
+
       // depist omniverse token to swap
       base.swapDeposit(network.chainName, userIndex, mintAmount, tokenX);
       base.swapDeposit(network.chainName, userIndex, mintAmount, tokenY);
       await utils.sleep(10);
-      this.getAllBalance(NetworkMgr.networks, users[1], tokenId, mintAmount);
 
       // check balance of swap.
       this.swapCheck(network.chainName, user, tokenX, mintAmount);
@@ -383,36 +387,52 @@ class Test {
       );
       await utils.sleep(10);
       this.swapCheck(network.chainName, user, tokenX, 0);
+
+      base.withdraw(
+        network.chainName,
+        userIndex,
+        tokenY,
+        mintAmount - 1000000000 - 1
+      );
+      await utils.sleep(10);
+      this.swapCheck(network.chainName, user, tokenY, 0);
+
       let ret = base.balanceOf(
         network.chainType,
         network.chainName,
         user,
         tokenX
       );
-      console.log(
+      
+      console.log('user:');
+      this.getAllBalance(
+        NetworkMgr.networks,
+        user,
         tokenX,
-        'expect omniverse balance:',
-        mintAmount - 10000000,
-        'balance of omniverse',
-        ret.toString()
+        mintAmount - 10000000
       );
-
-      this.getAllBalance(NetworkMgr.networks, users[1], tokenId, mintAmount - 10000000);
+      this.getAllBalance(
+        NetworkMgr.networks,
+        user,
+        tokenY,
+        mintAmount - 1000000000 - 1
+      );
     }
   }
 
   getAllBalance(networks, account, tokenId, expect) {
     for (let i in networks) {
       let network = networks[i];
-      let ret = base.balanceOf(
-        network.chainType,
-        network.chainName,
-        account,
-        tokenId
-      );
-      console.log("On", network.chainName, ret.toString());
+      let ret = base
+        .balanceOf(network.chainType, network.chainName, account, tokenId)
+        .toString();
+      console.log(tokenId + ' On', network.chainName, ret);
 
-      // assert(ret.includes(expect.toString()), 'Balance error');
+      assert(
+        ret.includes(expect.toLocaleString()) ||
+          ret.includes(expect.toString()),
+        'Balance error'
+      );
     }
   }
 

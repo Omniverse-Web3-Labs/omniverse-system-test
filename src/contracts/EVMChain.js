@@ -21,16 +21,19 @@ class EVMChainDeployer {
         let networks = NetworkMgr.getNetworksByType('EVM');
         for (let i in networks) {
             let template = config.get('tokenInfo')[contractType];
-            let contract = { tokenInfo: [...template] };
+            let contract = {};
             contract['omniverseChainId'] = networks[i].omniverseChainId;
             contract['contractType'] = contractType;
-            if (template.length != count) {
-                for (let j = 1; j < count; ++j) {
+            if (template.length < count) {
+                contract['tokenInfo'] = [...template];
+                for (let j = template.length; j < count; ++j) {
                     contract.tokenInfo.push({
                         name: contract.tokenInfo[0].name + j,
                         symbol: contract.tokenInfo[0].symbol + j,
                     })
                 }
+            } else {
+                contract['tokenInfo'] = [...template.slice(0, count)];
             }
             this.contracts[networks[i].chainName] = contract;
             let item = {};

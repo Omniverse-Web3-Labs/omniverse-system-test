@@ -48,7 +48,7 @@ async function init() {
 
 async function deploy(contractType, count) {
   let tests;
-  if (contractType == 'ft') {
+  if (contractType == 'token') {
     tests = ftTest;
   } else if (contractType == 'nft') {
     tests = nftTest;
@@ -87,12 +87,12 @@ async function deploy(contractType, count) {
 async function test(contractType, count, docker) {
   let tests;
   let doSwap;
-  if (contractType == 'ft') {
+  if (contractType == 'token') {
     tests = ftTest;
   } else if (contractType == 'nft') {
     tests = nftTest;
   } else if (contractType == 'swap') {
-    contractType = 'ft';
+    contractType = 'token';
     tests = ftTest;
     count = 2;
     doSwap = true;

@@ -11,15 +11,16 @@ class SubstrateDeployer {
     let networks = NetworkMgr.getNetworksByType('SUBSTRATE');
     for (let i in networks) {
       let template = config.get('tokenInfo')[contractType];
-      // console.log(template[0])
-      this.tokenInfo[networks[i].chainName] = [...template];
-      if (template.length != count) {
-        for (let j = 1; j < count; ++j) {
+      if (template.length < count) {
+        this.tokenInfo[networks[i].chainName] = [...template];
+        for (let j = template.length; j < count; ++j) {
           this.tokenInfo[networks[i].chainName].push({
             name: template[0].name + j,
             symbol: template[0].symbol + j,
           });
         }
+      } else {
+        this.tokenInfo[networks[i].chainName] = [...template.slice(0, count)];
       }
     }
   }
@@ -43,7 +44,7 @@ class SubstrateDeployer {
         owner.address,
         amount,
       ]);
-      if (contractType == 'ft') {
+      if (contractType == 'token') {
         await utils.enqueueTask(Queues, api, 'assets', 'createToken', alice, [
           accounts.getOwner()[1],
           tokenInfo.name,
@@ -98,7 +99,7 @@ class SubstrateDeployer {
             }
           }
         }
-        if (contractType == 'ft') {
+        if (contractType == 'token') {
           await utils.enqueueTask(Queues, api, 'assets', 'setMembers', owner, [
             tokenId,
             members,

@@ -27,14 +27,16 @@ class InkDeployer {
     let networks = NetworkMgr.getNetworksByType('INK');
     for (let i in networks) {
       let template = config.get('tokenInfo')[contractType];
-      this.tokenInfo[networks[i].chainName] = [...template];
-      if (template.length != count) {
-        for (let j = 1; j < count; ++j) {
+      if (template.length < count) {
+        this.tokenInfo[networks[i].chainName] = [...template];
+        for (let j = template.length; j < count; ++j) {
           this.tokenInfo[networks[i].chainName].push({
             name: template[0].name + j,
             symbol: template[0].symbol + j,
           });
         }
+      } else {
+        this.tokenInfo[networks[i].chainName] = [...template.slice(0, count)];
       }
     }
   }
@@ -113,7 +115,7 @@ class InkDeployer {
             }
           }
         }
-        if (contractType == 'ft') {
+        if (contractType == 'token') {
           await utils.enqueueTask(Queues, api, 'assets', 'setMembers', owner, [
             NetworkMgr.networks[i].tokenId,
             members,

@@ -32,7 +32,7 @@ class Synchronizer {
         item.tokenId = network.tokenId;
         item.nodeAddress = network.ws;
         item.omniverseChainId = network.omniverseChainId;
-        if (contractType == 'ft') {
+        if (contractType == 'token') {
           item.pallets = ['assets'];
         } else {
           item.pallets = ['uniques'];

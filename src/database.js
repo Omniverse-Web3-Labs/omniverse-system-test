@@ -28,7 +28,7 @@ class Database {
         item.omniverseContractAddress = network.omniverseContractAddress;
       } else if (network.chainType == 'SUBSTRATE') {
         item.tokenId = NetworkMgr.networks[i].tokenId;
-        if (contractType == 'ft') {
+        if (contractType == 'token') {
           item.pallets = ['assets'];
         } else {
           item.pallets = ['uniques'];

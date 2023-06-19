@@ -27,7 +27,7 @@ class ContractsMgr {
     for (let i in NetworkMgr.networks) {
       let network = NetworkMgr.networks[i];
       if (network.chainType == 'EVM') {
-        if (contractType == 'ft') {
+        if (contractType == 'token') {
           network.omniverseContractAddress =
             omniverseCfg[network.chainName].skywalkerFungibleAddress;
         } else {
@@ -36,7 +36,7 @@ class ContractsMgr {
         }
       }
     }
-    if (contractType == 'ft') {
+    if (contractType == 'token') {
       let cmd =
         'cd ' +
         config.get('submodules.omniverseContractPath') +
@@ -65,7 +65,7 @@ class ContractsMgr {
       if (network.chainType == 'EVM') {
         EVMChain.deployOmniverse(network);
       } else if (network.chainType == 'SUBSTRATE') {
-        if (contractType == 'ft') {
+        if (contractType == 'token') {
           network.pallet = ['assets'];
         } else if (contractType == 'nft') {
           network.pallet = ['uniques'];

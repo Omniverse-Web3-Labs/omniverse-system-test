@@ -16,7 +16,7 @@ module.exports = async function (deployer, network) {
 
   await deployer.deploy(OmniverseProtocolHelper);
   let chain = CHAIN_IDS[network];
-  if (chain.contractType == 'ft') {
+  if (chain.contractType == 'token') {
     await deployer.link(OmniverseProtocolHelper, SkywalkerFungible);
     for (let tokenInfo of chain.tokenInfo) {
       await deployer.deploy(SkywalkerFungible, chain.omniverseChainId, tokenInfo.name, tokenInfo.symbol);

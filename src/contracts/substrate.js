@@ -95,7 +95,8 @@ class SubstrateDeployer {
             } else if (network.chainType == 'SUBSTRATE') {
               members.push([omniverseChainId, tokenId]);
             } else if (network.chainType == 'INK') {
-              members.push([network.omniverseChainId, tokenId]);
+              let member = network.omniverseContractAddress[tokenId];
+              members.push([network.omniverseChainId, member]);
             }
           }
         }

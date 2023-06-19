@@ -9,9 +9,12 @@
         "inkOmniverseToolPath": "./submodules/omniverse-swap-tools/tool-for-ink/"
     },
     "tokenInfo": {
-        "ft": [{
+        "token": [{
             "name": "SKYWALKER",
             "symbol": "SKYWALKER"
+        }, {
+            "name": "EARTHWALKER",
+            "symbol": "EARTHWALKER"
         }]
     },
     "networks": [

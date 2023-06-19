@@ -12,6 +12,9 @@
         "ft": [{
             "name": "SKYWALKER",
             "symbol": "SKYWALKER"
+        }, {
+            "name": "EARTHWALKER",
+            "symbol": "EARTHWALKER"
         }]
     },
     "networks": [

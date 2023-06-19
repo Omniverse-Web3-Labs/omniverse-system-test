@@ -21,7 +21,7 @@ class EVMChainDeployer {
         let networks = NetworkMgr.getNetworksByType('EVM');
         for (let i in networks) {
             let template = config.get('tokenInfo')[contractType];
-            let contract = { tokenInfo: [{...template[0] }] };
+            let contract = { tokenInfo: [...template] };
             contract['omniverseChainId'] = networks[i].omniverseChainId;
             contract['contractType'] = contractType;
             if (template.length != count) {

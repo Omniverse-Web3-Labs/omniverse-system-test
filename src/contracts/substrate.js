@@ -12,8 +12,7 @@ class SubstrateDeployer {
     for (let i in networks) {
       let template = config.get('tokenInfo')[contractType];
       // console.log(template[0])
-      this.tokenInfo[networks[i].chainName] = [];
-      this.tokenInfo[networks[i].chainName].push({ ...template[0] });
+      this.tokenInfo[networks[i].chainName] = [...template];
       if (template.length != count) {
         for (let j = 1; j < count; ++j) {
           this.tokenInfo[networks[i].chainName].push({

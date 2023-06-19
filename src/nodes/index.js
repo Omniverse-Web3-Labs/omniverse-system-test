@@ -77,7 +77,9 @@ class NodesMgr {
         tar;
       if (!fs.existsSync(bin)) {
         if (!fs.existsSync(binPath + tar)) {
+          console.log('Waitting for download node-template');
           execSync(cmd);
+          console.log('Download node-template succeed');
         }
         cmd = 'cd ' + binPath + ' && tar -xzvf ' + tar;
         execSync(cmd);
@@ -91,10 +93,9 @@ class NodesMgr {
       let bin =
         process.platform == 'linux'
           ? binPath +
-            'artifacts/substrate-contract-node-linux/substrate-contract-node'
+            'artifacts/substrate-contract-node-linux/substrate-contracts-node'
           : binPath +
-            'artifacts/substrate-contracts-node-mac/substrate-contract-node';
-
+            'artifacts/substrate-contracts-node-mac/substrate-contracts-node';
       let cmd =
         'mkdir -p ' +
         binPath +
@@ -105,7 +106,9 @@ class NodesMgr {
         tar;
       if (!fs.existsSync(bin)) {
         if (!fs.existsSync(binPath + tar)) {
+          console.log('Waitting for download substrate-contract-node');
           execSync(cmd);
+          console.log('Download substrate-contract-node succeed');
         }
         cmd = 'cd ' + binPath + ' && tar -xzvf ' + tar;
         execSync(cmd);

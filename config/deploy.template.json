@@ -20,7 +20,7 @@
             "ws": "http://127.0.0.1:10100",
             "chainType": "EVM",
             "omniverseChainId": "3",
-            "chainId": 0,
+            "chainId": 1337,
             "coolingDown": 1,
             "chainName": "CHAIN1"
         },

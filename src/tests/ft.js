@@ -13,7 +13,8 @@ const prompt = require('prompt-sync')();
 
 class Test {
   async initialize() {
-    for (let tokenId of contractsMgr.tokenId) {
+    for (let token of contractsMgr.tokenId) {
+      let tokenId = token.name;
       console.log('tokenId', tokenId);
       let allienceInfo = '';
       for (let i in NetworkMgr.networks) {

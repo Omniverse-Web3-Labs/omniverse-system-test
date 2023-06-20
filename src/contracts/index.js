@@ -14,6 +14,19 @@ class ContractsMgr {
     EVMChain.beforeDeploy(contractType, count);
     SubstrateChain.beforeDeploy(contractType, count);
     InkChain.beforeDeploy(contractType, count);
+
+    let template = config.get('tokenInfo')[contractType];
+    if (template.length < count) {
+      this.tokenId = [...template];
+      for (let j = template.length; j < count; ++j) {
+        this.tokenId.push({
+          name: template[0].name + j,
+          symbol: template[0].symbol + j,
+        });
+      }
+    } else {
+      this.tokenId = [...template.slice(0, count)];
+    }
   }
 
   async afterDeploy(contractType) {
@@ -71,9 +84,8 @@ class ContractsMgr {
           network.pallet = ['uniques'];
         }
         network.tokenId = [];
-        for (let tokenInfo of SubstrateChain.tokenInfo[i]) {
+        for (let tokenInfo of this.tokenId) {
           network.tokenId.push(tokenInfo.name);
-          this.tokenId.push(tokenInfo.name);
           await SubstrateChain.deployOmniverse(
             network,
             contractType,

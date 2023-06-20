@@ -8,21 +8,7 @@ class SubstrateDeployer {
   }
 
   beforeDeploy(contractType, count) {
-    let networks = NetworkMgr.getNetworksByType('SUBSTRATE');
-    for (let i in networks) {
-      let template = config.get('tokenInfo')[contractType];
-      if (template.length < count) {
-        this.tokenInfo[networks[i].chainName] = [...template];
-        for (let j = template.length; j < count; ++j) {
-          this.tokenInfo[networks[i].chainName].push({
-            name: template[0].name + j,
-            symbol: template[0].symbol + j,
-          });
-        }
-      } else {
-        this.tokenInfo[networks[i].chainName] = [...template.slice(0, count)];
-      }
-    }
+    
   }
 
   async deployOmniverse(chainInfo, contractType, tokenInfo) {

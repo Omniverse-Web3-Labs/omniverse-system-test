@@ -1,0 +1,62 @@
+{
+    "submodules": {
+        "omniverseContractPath": "./submodules/omniverse-evm/contracts/",
+        "omniverseToolPath": "./submodules/omniverse-evm/contracts/",
+        "synchronizerPath": "./submodules/omniverse-synchronizer/",
+        "substrateOmniverseToolPath": "./submodules/omniverse-swap-tools/omniverse-helper/",
+        "databasePath": "./submodules/omniverse-database/",
+        "swapServicePath": "./submodules/omniverse-service/swap/",
+        "inkOmniverseToolPath": "./submodules/omniverse-swap-tools/tool-for-ink/"
+    },
+    "tokenInfo": {
+        "token": [{
+            "name": "SKYWALKER",
+            "symbol": "SKYWALKER"
+        }, {
+            "name": "EARTHWALKER",
+            "symbol": "EARTHWALKER"
+        }]
+    },
+    "networks": [
+        {
+            "chainId": 1337,
+            "chainType": "EVM",
+            "coolingDown": 1
+        },
+        {
+            "chainType": "SUBSTRATE",
+            "coolingDown": 1,
+            "count": 1
+        },
+        {
+            "chainType": "INK",
+            "coolingDown": 0,
+            "count": 1
+        }
+    ],
+    "synchronizer": {
+        "scanInterval": 1,
+        "logLevel": "debug",
+        "secret": "config/.secret",
+        "stateDB": ".state",
+        "database": "http://127.0.0.1:port/omniverse/v1/pending",
+        "payload": {
+            "keys": ["op", "exData", "amount"],
+            "types": ["uint8", "bytes", "uint256"]
+        },
+        "networkTemp": {
+            "EVM": {
+                "omniverseContractAbiPath": "./res/EVMContract.json",
+                "compatibleChain": "ethereum"
+            },
+            "SUBSTRATE": {
+                "chainId": 1,
+                "compatibleChain": "substrate"
+            },
+            "INK": {
+                "abiPath": "./res/INKContract.json",
+                "compatibleChain": "ink"
+            }
+        }
+    }
+}

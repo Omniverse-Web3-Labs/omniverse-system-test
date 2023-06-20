@@ -179,6 +179,9 @@ class Test {
 
     await this.initialize();
 
+    SwapService.prepare();
+    await SwapService.launch();
+
     await utils.sleep(10);
   }
 
@@ -246,13 +249,13 @@ class Test {
     } else {
       await synchronizer.launch();
     }
-    if (doSwap) {
-      SwapService.prepare();
-      await SwapService.launch();
-      console.log('do swap test');
-      await this.doSwapTest();
-      return;
-    }
+    // if (doSwap) {
+    //   SwapService.prepare();
+    //   await SwapService.launch();
+    //   console.log('do swap test');
+    //   await this.doSwapTest();
+    //   return;
+    // }
     let users = accounts.getUsers()[1];
     // Mint token to user 1
     console.log('Mint token');
@@ -403,7 +406,7 @@ class Test {
         user,
         tokenX
       );
-      
+
       console.log('user:');
       this.getAllBalance(
         NetworkMgr.networks,

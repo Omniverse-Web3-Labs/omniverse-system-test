@@ -54,6 +54,7 @@ async function deploy(contractType, count) {
     tests = nftTest;
   } else {
     console.log('Contract type error');
+    return;
   }
 
   ////////////////////////////////////////////////////////

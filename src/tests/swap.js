@@ -42,7 +42,7 @@ class SwapService {
         for (let id of ids) {
             cmd = 'lsof -p ' + id;
             let result = execSync(cmd).toString();
-            console.log(result)
+            // console.log(result)
             if (result.includes('omniverse-service')) {
                 process.kill(id)
                 return;

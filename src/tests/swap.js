@@ -54,13 +54,13 @@ class SwapService {
     async launch() {
         this.beforeLaunch();
 
-        var logStream = fs.createWriteStream(config.get('submodules.swapServicePath') + 'out.log', {flags: 'a'});
-        this.instance = spawn('node', ['index.js'], {
-            cwd: config.get('submodules.swapServicePath'),
-            detached: true
+        let childProcess = spawn('nohup node index.js > ./out.log 2>&1 &', {
+          cwd: config.get('submodules.swapServicePath'),
+          detached: true,
+          shell: true,
         });
-        this.instance.stdout.pipe(logStream);
-        this.instance.stderr.pipe(logStream);
+        childProcess.unref();
+        
         await utils.sleep(5);
     }
 }

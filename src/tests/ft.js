@@ -276,6 +276,14 @@ class Test {
           tokenId
         );
         await utils.sleep(10);
+        await base.burn(
+          network.chainType,
+          network.chainName,
+          users[1],
+          50,
+          tokenId
+        );
+        await utils.sleep(10);
         await base.transfer(
           network.chainType,
           network.chainName,
@@ -297,7 +305,7 @@ class Test {
           NetworkMgr.networks,
           users[1],
           tokenId,
-          (100 - 11) * index
+          (100 - 50 - 11) * index
         );
         console.log('user2:');
         this.getAllBalance(NetworkMgr.networks, users[2], tokenId, 11 * index);

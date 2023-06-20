@@ -76,6 +76,69 @@ module.exports = {
     console.log('mint', chainType, ret.toString());
   },
 
+  async burn(chainType, chainName, from, token, tokenId) {
+    let ret;
+    if (chainType == 'EVM') {
+      let subCommand = tokenId ? ' -ti ' + tokenId : '';
+      let cmd =
+        'cd ' +
+        config.get('submodules.omniverseToolPath') +
+        ' && node register/index.js -s 0';
+      execSync(cmd);
+      cmd =
+        'cd ' +
+        config.get('submodules.omniverseToolPath') +
+        ' && node register/index.js -b ' +
+        chainName +
+        ',' +
+        from +
+        ',' +
+        token +
+        subCommand;
+      ret = execSync(cmd);
+      await utils.sleep(2);
+    } else if (chainType == 'SUBSTRATE') {
+      let cmd =
+        'cd ' +
+        config.get('submodules.substrateOmniverseToolPath') +
+        ' && node index.js -s 0';
+      execSync(cmd);
+      cmd =
+        'cd ' +
+        config.get('submodules.substrateOmniverseToolPath') +
+        ' && node index.js -b ' +
+        chainName +
+        ',' +
+        tokenId +
+        ',' +
+        from +
+        ',' +
+        token;
+      ret = execSync(cmd);
+      await utils.sleep(3);
+    } else if (chainType == 'INK') {
+      let subCommand = tokenId ? ' -ti ' + tokenId : '';
+      let cmd =
+        'cd ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        ' && node index.js -s 0';
+      execSync(cmd);
+      cmd =
+        'cd ' +
+        config.get('submodules.inkOmniverseToolPath') +
+        ' && node index.js -b ' +
+        chainName +
+        ',' +
+        from +
+        ',' +
+        token +
+        subCommand;
+      ret = execSync(cmd);
+      await utils.sleep(3);
+    }
+    console.log('burn', chainType, ret.toString());
+  },
+
   async transfer(chainType, chainName, fromIndex, to, token, tokenId) {
     let ret;
     if (chainType == 'EVM') {

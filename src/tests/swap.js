@@ -40,7 +40,7 @@ class SwapService {
         let pIds = execSync(cmd).toString();
         const ids = pIds.split(/\r?\n/).filter(item => item !== "");
         for (let id of ids) {
-            cmd = 'lsof -p ' + id;
+            cmd = 'lsof -w -p ' + id;
             let result = execSync(cmd).toString();
             // console.log(result)
             if (result.includes('omniverse-service')) {

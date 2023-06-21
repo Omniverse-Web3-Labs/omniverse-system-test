@@ -249,13 +249,13 @@ class Test {
     } else {
       await synchronizer.launch();
     }
-    // if (doSwap) {
-    //   SwapService.prepare();
-    //   await SwapService.launch();
-    //   console.log('do swap test');
-    //   await this.doSwapTest();
-    //   return;
-    // }
+    if (doSwap) {
+      // SwapService.prepare();
+      // await SwapService.launch();
+      console.log('do swap test');
+      await this.doSwapTest();
+      return;
+    }
     let users = accounts.getUsers()[1];
     // Mint token to user 1
     console.log('Mint token');

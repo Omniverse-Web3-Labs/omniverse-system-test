@@ -57,6 +57,11 @@ class Database {
   }
 
   prepare(contractType) {
+    console.log(
+      '///////////////////////////////////////////////////\
+      \n//             Prepare for Database             //\
+      \n//////////////////////////////////////////////////'
+    );
     this.updateDatabaseConfig(contractType);
 
     this.updateDatabaseRes(contractType);

@@ -1,15 +1,15 @@
-const { execSync, spawn } = require('child_process');
+const { exec, execSync, spawn } = require('child_process');
 const accounts = require('./utils/accounts');
 const config = require('config');
 const utils = require('./utils/utils');
-const Database = require('./database');
+const database = require('./database');
 
 class Synchronizer {
   constructor() {
     this.instance;
   }
 
-  updateConfig(contractType) {
+  async updateConfig(contractType) {
     console.log('Synchronizer updateConfig');
     let cfg = JSON.parse(JSON.stringify(config.get('synchronizer')));
     cfg.networks = {};
@@ -45,11 +45,33 @@ class Synchronizer {
           NetworkMgr.networks[i].omniverseContractAddress;
         item.nodeAddress = network.ws;
         item.omniverseChainId = network.omniverseChainId;
+      } else if (network.chainType == 'BTC') {
+        item = JSON.parse(
+          JSON.stringify(config.get('synchronizer.networkTemp.BTC'))
+        );
+        item.omniverseChainId = network.omniverseChainId;
+        // clear data
+        let ret = execSync('rm -rf ~/.local/share/ord/regtest');
+        console.debug('clear ord', ret.toString());
+        // create an account for creating inscriptions
+        ret = execSync('ord -r --bitcoin-rpc-pass=b --bitcoin-rpc-user=a wallet create');
+        console.debug('create wallet', ret.toString());
+        let accountStr = execSync('ord -r --bitcoin-rpc-pass=b --bitcoin-rpc-user=a wallet receive');
+        let account = JSON.parse(accountStr.toString()).address;
+        console.log('account', account);
+        // get some BTC for gas fee
+        ret = exec('bitcoin-cli -regtest -rpcuser=a -rpcpassword=b generatetoaddress 101 ' + account);
+        await utils.sleep(2);
+        setInterval(() => {
+            exec('bitcoin-cli -regtest -rpcuser=a -rpcpassword=b generatetoaddress 1 ' + account);
+        }, 1000);
       }
       cfg.networks[network.chainName] = item;
     }
-    let database = cfg.database.replace('port', Database.port);
-    cfg.database = database;
+    if (cfg.database) {
+      let databaseRpc = cfg.database.replace('port', database.port);
+      cfg.database = databaseRpc;
+    }
     fs.writeFileSync(
       config.get('submodules.synchronizerPath') + 'config/default.json',
       JSON.stringify(cfg, null, '\t')
@@ -94,7 +116,7 @@ class Synchronizer {
       \n//           Prepare for Synchronizer           //\
       \n//////////////////////////////////////////////////'
     );
-    this.updateConfig(contractType);
+    await this.updateConfig(contractType);
 
     this.updateRes();
 

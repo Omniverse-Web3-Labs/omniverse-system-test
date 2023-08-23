@@ -33,12 +33,16 @@ class Test {
               'hex'
             );
           item = '"' + network.omniverseChainId + '|' + name + '"';
+        } else if (network.chainType == 'BTC') {
+          item = '"' + network.omniverseChainId + '|0x' + Buffer.from('BTC').toString('hex') + '"';
         }
 
         if (allienceInfo == '') {
           allienceInfo = item;
         } else {
-          allienceInfo += ',' + item;
+          if (item != '') {
+            allienceInfo += ',' + item;
+          }
         }
       }
       let cmd;
@@ -264,10 +268,15 @@ class Test {
     for (let i in NetworkMgr.networks) {
       let network = NetworkMgr.networks[i];
       console.log(i, network.chainType);
-      let tokenIds =
-        network.chainType != 'SUBSTRATE'
-          ? Object.keys(network.omniverseContractAddress)
-          : network.tokenId;
+      let tokenIds = [];
+      if (network.chainType != 'SUBSTRATE') {
+        if (network.omniverseContractAddress) {
+          tokenIds = Object.keys(network.omniverseContractAddress);
+        }
+      }
+      else {
+        tokenIds = network.tokenId;
+      }
       for (let tokenId of tokenIds) {
         await base.mint(
           network.chainType,
@@ -435,6 +444,9 @@ class Test {
   getAllBalance(networks, account, tokenId, expect) {
     for (let i in networks) {
       let network = networks[i];
+      if (network.chainType == 'BTC') {
+        continue;
+      }
       let ret = base
         .balanceOf(network.chainType, network.chainName, account, tokenId)
         .toString();

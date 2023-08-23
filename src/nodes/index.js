@@ -1,6 +1,7 @@
 const EVMChain = require('./EVMChain');
 const SustrateChain = require('./substrate');
 const InkChain = require('./ink');
+const BTCChain = require('./BTCChain');
 const { execSync } = require('child_process');
 
 class NodesMgr {
@@ -56,6 +57,8 @@ class NodesMgr {
       SustrateChain.launch(this.port, chainInfo);
     } else if (chainInfo.chainType == 'INK') {
       InkChain.launch(this.port, chainInfo);
+    } else if (chainInfo.chainType == 'BTC') {
+      BTCChain.launch(this.port, chainInfo);
     }
   }
 

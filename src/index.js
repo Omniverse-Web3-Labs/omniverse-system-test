@@ -7,6 +7,7 @@ const accounts = require('./utils/accounts');
 const { program } = require('commander');
 const { execSync } = require('child_process');
 const synchronizer = require('./synchronizer');
+const database = require('./database');
 const { queue } = require('async');
 const { substrateTxWorker } = require('./utils/utils');
 const utils = require('./utils/utils');
@@ -19,6 +20,8 @@ function install() {
     'cd ' + config.get('submodules.omniverseContractPath') + ' && npm install';
   execSync(cmd);
   cmd = 'cd ' + config.get('submodules.synchronizerPath') + ' && npm install';
+  execSync(cmd);
+  cmd = 'cd ' + config.get('submodules.databasePath') + ' && npm install';
   execSync(cmd);
   cmd =
     'cd ' +
@@ -71,6 +74,11 @@ async function deploy(contractType, count) {
   //                  Deploy Contracts                  //
   ////////////////////////////////////////////////////////
   await contracts.deploy(contractType, count);
+
+  ////////////////////////////////////////////////////////
+  //                Prepare Database                //
+  ////////////////////////////////////////////////////////
+  database.prepare(contractType);
 
   ////////////////////////////////////////////////////////
   //                Prepare Synchronizer                //

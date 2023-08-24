@@ -10,3 +10,6 @@
 [submodule "submodules/omniverse-swap-tools"]
 	path = submodules/omniverse-swap-tools
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-swap-tools.git
+[submodule "submodules/omniverse-service"]
+	path = submodules/omniverse-service
+	url = https://github.com/Omniverse-Web3-Labs/omniverse-service.git

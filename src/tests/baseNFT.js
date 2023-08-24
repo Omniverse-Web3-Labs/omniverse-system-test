@@ -9,54 +9,58 @@ module.exports = {
         execSync(cmd);
     },
 
-    async mint(chainType, chainName, to, token) {
+    async mint(chainType, chainName, to, token, oTokenId) {
         if (chainType == 'EVM') {
             let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -s 0';
             execSync(cmd);
-            cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -m ' + chainName + ',' + to + ',' + token;
+            let subCommand = oTokenId ? ' -ti ' + oTokenId : '';
+            cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -m ' + chainName + ',' + to + ',' + token + subCommand;
             execSync(cmd);
             await utils.sleep(2);
         } else if (chainType == 'SUBSTRATE') {
             let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s 0';
             execSync(cmd);
-            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -m ' + chainName + ',' + to + ',' + token;
+            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -m ' + chainName + ',' + oTokenId + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(3);
         }
     },
 
-    async transfer(chainType, chainName, fromIndex, to, token) {
+    async transfer(chainType, chainName, fromIndex, to, token, oTokenId) {
         if (chainType == 'EVM') {
             let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -s ' + fromIndex;
             execSync(cmd);
-            cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -t ' + chainName + ',' + to + ',' + token;
+            let subCommand = oTokenId ? ' -ti ' + oTokenId : '';
+            cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -t ' + chainName + ',' + to + ',' + token + subCommand;
             execSync(cmd);
             await utils.sleep(2);
         } else if (chainType == 'SUBSTRATE') {
             let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -s ' + fromIndex;
             execSync(cmd);
-            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -t ' + chainName + ',' + to + ',' + token;
+            cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -t ' + chainName + ',' + oTokenId + ',' + to + ',' + token;
             execSync(cmd);
             await utils.sleep(3);
         }
     },
 
-    async balanceOf(chainType, chainName, account) {
+    async balanceOf(chainType, chainName, account, oTokenId) {
         let ret;
         if (chainType == 'EVM') {
-            let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -ob ' + chainName + ',' + account;
+            let subCommand = oTokenId ? ' -ti ' + oTokenId : '';
+            let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -ob ' + chainName + ',' + account + subCommand;
             ret = execSync(cmd);
         } else if (chainType == 'SUBSTRATE') {
-            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -o ' + chainName + ',' + account;
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -p uniques -o ' + chainName + ',' + oTokenId + ',' + account;
             ret = execSync(cmd);
         }
         return ret;
     },
 
-    ownerOf(chainType, chainName, tokenId) {
+    ownerOf(chainType, chainName, tokenId, oTokenId) {
         let ret;
         if (chainType == 'EVM') {
-            let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -oo ' + chainName + ',' + tokenId;
+            let subCommand = oTokenId ? ' -ti ' + oTokenId : '';
+            let cmd = 'cd ' + config.get('submodules.omniverseToolPath') + ' && node register/nft.js -oo ' + chainName + ',' + tokenId + subCommand;
             try {
                 ret = execSync(cmd);
             }
@@ -64,30 +68,34 @@ module.exports = {
                 ret = e;
             }
         } else if (chainType == 'SUBSTRATE') {
-            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -n ' + chainName + ',NFT,' + tokenId;
+            let cmd = 'cd ' + config.get('submodules.substrateOmniverseToolPath') + ' && node index.js -n ' + chainName + ',' + oTokenId + ',' + tokenId;
             ret = execSync(cmd);
         }
         return ret;
     },
 
-    async transferSubstrateOriginToken(network, users, porter) {
+    async transferSubstrateNativeToken(network, users, porter) {
         let provider = new WsProvider(network.ws);
         let api = await ApiPromise.create({
-            provider,
-            noInitWarn: true,
+          provider,
+          noInitWarn: true,
         });
         let amount = BigInt('1000000000000000');
         let keyring = new Keyring({ type: 'sr25519' });
         let alice = keyring.addFromUri('//Alice');
         for (let user of users) {
-            let address = utils.toSubstrateAddress(user);
-            await api.tx.balances.transfer(address, amount).signAndSend(alice);
-            console.log('Substrate waiting for in block');
-            await utils.sleep(10);
+          let address = utils.toSubstrateAddress(user);
+          await utils.enqueueTask(Queues, api, 'balances', 'transfer', alice, [
+            address,
+            amount,
+          ]);
         }
-        let address = keyring.addFromSeed(Buffer.from(porter.substr(2), 'hex')).address;
-        await api.tx.balances.transfer(address, amount).signAndSend(alice);
-        console.log('Substrate waiting for in block');
-        await utils.sleep(10);
+        let address = keyring.addFromSeed(
+          Buffer.from(porter.substr(2), 'hex')
+        ).address;
+        await utils.enqueueTask(Queues, api, 'balances', 'transfer', alice, [
+          address,
+          amount,
+        ]);
     }
 }

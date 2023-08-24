@@ -29,7 +29,7 @@ class NetworkMgr {
                 this.networks[cfg.chainName] = cfg;
             }
         }
-        console.log('networkMgr', this.networks);
+        console.log('NetworkMgr', this.networks);
     }
 
     getNetworksByType(chainType) {

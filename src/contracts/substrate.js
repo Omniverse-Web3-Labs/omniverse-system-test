@@ -1,13 +1,18 @@
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
 const accounts = require('../utils/accounts');
+const config = require('config');
 const utils = require('../utils/utils');
 class SubstrateDeployer {
   constructor() {
-    this.contracts = {};
+    this.tokenInfo = {};
   }
 
-  async deployOmniverse(chainInfo, contractType) {
-    console.log('deployOmniverse', chainInfo);
+  beforeDeploy(contractType, count) {
+    
+  }
+
+  async deployOmniverse(chainInfo, contractType, tokenInfo) {
+    console.log('Substrate deploy omniverse', chainInfo);
     let keyring = new Keyring({ type: 'ecdsa' });
     let owner = keyring.addFromSeed(
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))
@@ -25,58 +30,71 @@ class SubstrateDeployer {
         owner.address,
         amount,
       ]);
-      if (contractType == 'ft') {
+      if (contractType == 'token') {
         await utils.enqueueTask(Queues, api, 'assets', 'createToken', alice, [
           accounts.getOwner()[1],
-          chainInfo.tokenId,
+          tokenInfo.name,
           null,
-          1
+          1,
+        ]);
+        let assetId = (
+          await api.query.assets.tokenId2AssetId(tokenInfo.name)
+        ).toJSON();
+        await utils.enqueueTask(Queues, api, 'assets', 'setMetadata', owner, [
+          assetId,
+          tokenInfo.name,
+          tokenInfo.symbol,
+          12,
         ]);
       } else {
         await utils.enqueueTask(Queues, api, 'uniques', 'createToken', alice, [
           accounts.getOwner()[1],
-          chainInfo.tokenId,
+          tokenInfo.name,
           null,
-          1
+          1,
         ]);
       }
     }
     console.log('Substrate waiting for in block');
   }
 
-  async setMembers(contractType) {
+  async setMembers(contractType, tokenId) {
     console.log('Substrate set members');
     let keyring = new Keyring({ type: 'ecdsa' });
     let owner = keyring.addFromSeed(
       Buffer.from(utils.toByteArray(accounts.getOwner()[0]))
     );
-    for (let i in global.networkMgr.networks) {
-      if (global.networkMgr.networks[i].chainType == 'SUBSTRATE') {
-        let provider = new WsProvider(global.networkMgr.networks[i].ws);
+    for (let i in NetworkMgr.networks) {
+      if (NetworkMgr.networks[i].chainType == 'SUBSTRATE') {
+        let provider = new WsProvider(NetworkMgr.networks[i].ws);
         let api = await ApiPromise.create({
           provider,
           noInitWarn: true,
         });
         let members = [];
-        for (let j in global.networkMgr.networks) {
-          let network = global.networkMgr.networks[j];
+        for (let j in NetworkMgr.networks) {
+          let network = NetworkMgr.networks[j];
           if (j != i) {
             if (network.chainType == 'EVM') {
-              members.push([network.omniverseChainId, network.EVMContract]);
+              let member = network.omniverseContractAddress[tokenId];
+              members.push([network.omniverseChainId, member]);
             } else if (network.chainType == 'SUBSTRATE') {
-              members.push([omniverseChainId, network.tokenId]);
+              members.push([omniverseChainId, tokenId]);
+            } else if (network.chainType == 'INK') {
+              let member = network.omniverseContractAddress[tokenId];
+              members.push([network.omniverseChainId, member]);
             }
           }
         }
-        if (contractType == 'ft') {
+        if (contractType == 'token') {
           await utils.enqueueTask(Queues, api, 'assets', 'setMembers', owner, [
-            networkMgr.networks[i].tokenId,
-            members
+            tokenId,
+            members,
           ]);
         } else {
           await utils.enqueueTask(Queues, api, 'uniques', 'setMembers', owner, [
-            networkMgr.networks[i].tokenId,
-            members
+            tokenId,
+            members,
           ]);
         }
       }

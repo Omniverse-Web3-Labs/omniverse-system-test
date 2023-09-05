@@ -51,7 +51,14 @@ class Synchronizer {
         );
         item.omniverseChainId = network.omniverseChainId;
         // clear data
-        let ret = execSync('rm -rf ~/.local/share/ord/regtest');
+        let ret;
+        if (process.platform == 'darwin') {
+          ret = execSync(
+            'rm -rf "/Users/${USER}/Library/Application\ Support/Bitcoin/regtest/ord"'
+          );
+        } else if (process.platform == 'linux') {
+          ret = execSync('rm -rf ~/.local/share/ord/regtest');
+        }
         console.debug('clear ord', ret.toString());
         // create an account for creating inscriptions
         ret = execSync('ord -r --bitcoin-rpc-pass=b --bitcoin-rpc-user=a wallet create');

@@ -54,7 +54,7 @@ class Synchronizer {
         let ret;
         if (process.platform == 'darwin') {
           ret = execSync(
-            'rm -rf "/Users/${USER}/Library/Application\ Support/Bitcoin/regtest/ord"'
+            'rm -rf "/Users/${USER}/Library/Application\ Support/ord/regtest"'
           );
         } else if (process.platform == 'linux') {
           ret = execSync('rm -rf ~/.local/share/ord/regtest');

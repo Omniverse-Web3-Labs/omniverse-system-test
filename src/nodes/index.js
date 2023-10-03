@@ -16,7 +16,7 @@ class NodesMgr {
   /**
    * @method launch Launch nodes for testing
    */
-  launch() {
+  async launch() {
     console.log(
       '///////////////////////////////////////////////////\
       \n//                 Launch Nodes                  //\
@@ -27,7 +27,7 @@ class NodesMgr {
         continue;
       }
       this.download(NetworkMgr.networks[i]);
-      this.launchChain(NetworkMgr.networks[i]);
+      await this.launchChain(NetworkMgr.networks[i]);
       if (NetworkMgr.networks[i].chainType == 'SUBSTRATE') {
         NetworkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
         NetworkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
@@ -49,7 +49,7 @@ class NodesMgr {
    * @param chainInfo Information of the chain to be launched
    * @return Port of the chain
    */
-  launchChain(chainInfo) {
+  async launchChain(chainInfo) {
     console.log('launchChain', chainInfo);
     if (chainInfo.chainType == 'EVM') {
       EVMChain.launch(this.port, chainInfo);
@@ -58,7 +58,7 @@ class NodesMgr {
     } else if (chainInfo.chainType == 'INK') {
       InkChain.launch(this.port, chainInfo);
     } else if (chainInfo.chainType == 'BTC') {
-      BTCChain.launch(this.port, chainInfo);
+      await BTCChain.launch(this.port, chainInfo);
     }
   }
 

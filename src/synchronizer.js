@@ -50,28 +50,8 @@ class Synchronizer {
           JSON.stringify(config.get('synchronizer.networkTemp.BTC'))
         );
         item.omniverseChainId = network.omniverseChainId;
-        // clear data
-        let ret;
-        if (process.platform == 'darwin') {
-          ret = execSync(
-            'rm -rf "/Users/${USER}/Library/Application\ Support/ord/regtest"'
-          );
-        } else if (process.platform == 'linux') {
-          ret = execSync('rm -rf ~/.local/share/ord/regtest');
-        }
-        console.debug('clear ord', ret.toString());
-        // create an account for creating inscriptions
-        ret = execSync('ord -r --bitcoin-rpc-pass=b --bitcoin-rpc-user=a wallet create');
-        console.debug('create wallet', ret.toString());
-        let accountStr = execSync('ord -r --bitcoin-rpc-pass=b --bitcoin-rpc-user=a wallet receive');
-        let account = JSON.parse(accountStr.toString()).address;
-        console.log('account', account);
-        // get some BTC for gas fee
-        ret = exec('bitcoin-cli -regtest -rpcuser=a -rpcpassword=b generatetoaddress 101 ' + account);
-        await utils.sleep(2);
-        setInterval(() => {
-            exec('bitcoin-cli -regtest -rpcuser=a -rpcpassword=b generatetoaddress 1 ' + account);
-        }, 1000);
+        item.networkType = network.networkType;
+        item.url = network.rpc;
       }
       cfg.networks[network.chainName] = item;
     }

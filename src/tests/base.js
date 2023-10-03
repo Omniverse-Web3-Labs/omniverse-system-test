@@ -240,6 +240,9 @@ module.exports = {
         account +
         subCommand;
       ret = execSync(cmd);
+    } else if (chainType == 'BTC') {
+      let cmd = `curl http://127.0.0.1:3000/api/omniverseBalanceOf?pk=${account}`;
+      ret = execSync(cmd);
     }
     return ret;
   },

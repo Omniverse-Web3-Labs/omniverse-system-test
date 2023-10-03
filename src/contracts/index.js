@@ -1,6 +1,7 @@
 const config = require('config');
 const { execSync } = require('child_process');
 const EVMChain = require('./EVMChain');
+const BTCChain = require('./BTCChain');
 const SubstrateChain = require('./substrate');
 const InkChain = require('./ink');
 const utils = require('../utils/utils');
@@ -102,6 +103,8 @@ class ContractsMgr {
           );
           network.omniverseContractAddress[tokenInfo.name] = address;
         }
+      } else if (network.chainType == 'BTC') {
+        BTCChain.deployOmniverse(network);
       }
       NetworkMgr.networks[i] = network;
     }

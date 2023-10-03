@@ -444,9 +444,6 @@ class Test {
   getAllBalance(networks, account, tokenId, expect) {
     for (let i in networks) {
       let network = networks[i];
-      if (network.chainType == 'BTC') {
-        continue;
-      }
       let ret = base
         .balanceOf(network.chainType, network.chainName, account, tokenId)
         .toString();

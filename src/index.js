@@ -23,6 +23,8 @@ function install() {
   execSync(cmd);
   cmd = 'cd ' + config.get('submodules.databasePath') + ' && npm install';
   execSync(cmd);
+  cmd = 'cd ' + config.get('submodules.bitcoinBackendPath') + ' && npm install';
+  execSync(cmd);
   cmd =
     'cd ' +
     config.get('submodules.substrateOmniverseToolPath') +

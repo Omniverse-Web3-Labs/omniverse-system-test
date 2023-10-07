@@ -2,6 +2,7 @@
     "submodules": {
         "omniverseContractPath": "./submodules/omniverse-evm/contracts/",
         "omniverseToolPath": "./submodules/omniverse-evm/contracts/",
+        "bitcoinBackendPath": "./submodules/omniverse-bitcoin-backend/",
         "synchronizerPath": "./submodules/omniverse-synchronizer/",
         "substrateOmniverseToolPath": "./submodules/omniverse-swap-tools/omniverse-helper/",
         "databasePath": "./submodules/omniverse-database/",
@@ -24,7 +25,9 @@
             "coolingDown": 1
         },
         {
+            "rpc": "http://198.11.168.201:18333",
             "chainType": "BTC",
+            "networkType": "regtest",
             "coolingDown": 1
         }
     ],

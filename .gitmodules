@@ -16,3 +16,6 @@
 [submodule "omniverse-bitcoin-backend"]
 	path = omniverse-bitcoin-backend
 	url = https://github.com/Omniverse-Web3-Labs/omniverse-bitcoin-backend.git
+[submodule "submodules/omniverse-bitcoin-backend"]
+	path = submodules/omniverse-bitcoin-backend
+	url = https://github.com/Omniverse-Web3-Labs/omniverse-bitcoin-backend.git

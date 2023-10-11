@@ -37,6 +37,8 @@ class NodesMgr {
       } else if (NetworkMgr.networks[i].chainType == 'INK') {
         NetworkMgr.networks[i].rpc = 'ws://127.0.0.1:' + this.port;
         NetworkMgr.networks[i].ws = 'ws://127.0.0.1:' + this.port;
+      } else if (NetworkMgr.networks[i].chainType == 'BTC') {
+        NetworkMgr.networks[i].rpc = 'http://127.0.0.1:18443';
       }
       NetworkMgr.networks[i].port = this.port;
       this.nodesInfo[i] = this.port++;

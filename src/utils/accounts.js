@@ -9,7 +9,7 @@ class Accounts {
     if (config.has('accounts')) {
       let secret = JSON.parse(fs.readFileSync(config.get('accounts')));
       this.sks = secret;
-      assert(this.sks.length == 2, 'Accounts config error');
+      assert(this.sks.length == 3, 'Accounts config error');
     } else {
       this.sks = [
         '0x0cc0c2de7e8c30525b4ca3b9e0b9703fb29569060d403261055481df7014f7fa',

@@ -83,6 +83,8 @@ class SubstrateDeployer {
             } else if (network.chainType == 'INK') {
               let member = network.omniverseContractAddress[tokenId];
               members.push([network.omniverseChainId, member]);
+            } else if (network.chainType == 'BTC') {
+              members.push([network.omniverseChainId, tokenId]);
             }
           }
         }

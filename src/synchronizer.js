@@ -52,6 +52,7 @@ class Synchronizer {
         item.omniverseChainId = network.omniverseChainId;
         item.networkType = network.networkType;
         item.url = network.rpc;
+        item.server = config.get('btcBackend.url');
       }
       cfg.networks[network.chainName] = item;
     }

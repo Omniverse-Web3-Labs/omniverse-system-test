@@ -25,7 +25,7 @@
             "coolingDown": 1
         },
         {
-            "rpc": "http://198.11.168.201:18333",
+            // "rpc": "http://127.0.0.1:18332",
             "chainType": "BTC",
             "networkType": "regtest",
             "coolingDown": 1
@@ -85,5 +85,8 @@
                 "compatibleChain": "bitcoin"
             }
         }
+    },
+    "btcBackend": {
+        "url": "http://127.0.0.1:3000/"
     }
 }
